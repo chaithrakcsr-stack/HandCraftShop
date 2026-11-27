@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HANDCRAFT SHOP | Kinetic Dark Artisanal Atelier</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cinzel, Cormorant Garamond & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['"Cinzel"', 'Georgia', 'serif'],
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        obsidian: '#070606',
+                        charcoal: '#12100E',
+                        umber: '#1A1613',
+                        gold: '#E5B869',
+                        terracotta: '#E06D53',
+                        brass: '#B8864B',
+                        ivory: '#F7F3EA',
+                        sand: '#A69D90'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --obsidian: #070606;
+            --charcoal: #12100E;
+            --gold: #E5B869;
+            --terracotta: #E06D53;
+            --brass: #B8864B;
+            --ivory: #F7F3EA;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--ivory);
+            overflow-x: hidden;
+        }
+
+        /* Ambient Pointer Spotlight & Obsidian Mesh */
+        .obsidian-bg {
+            background-image:
+                radial-gradient(circle at 15% 12%, rgba(224, 109, 83, 0.14), transparent 40%),
+                radial-gradient(circle at 85% 22%, rgba(229, 184, 105, 0.12), transparent 44%),
+                radial-gradient(circle at 50% 80%, rgba(184, 134, 75, 0.08), transparent 50%);
+        }
+
+        #pointer-spotlight {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(650px circle at var(--spot-x, 50vw) var(--spot-y, 50vh), rgba(229, 184, 105, 0.08), transparent 65%);
+        }
+
+        /* 1. Custom Magnetic Trailing Cursor */
+        @media (pointer: fine) {
+            body { cursor: none; }
+            a, button, input, select, [role="button"] { cursor: none; }
+        }
+
+        #cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background: #E06D53;
+            box-shadow: 0 0 12px #E06D53;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate3d(-50%, -50%, 0);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+        }
+
+        #cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 38px;
+            height: 38px;
+            border-radius: 9999px;
+            border: 1.5px solid rgba(229, 184, 105, 0.75);
+            box-shadow: 0 0 20px rgba(229, 184, 105, 0.2);
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate3d(-50%, -50%, 0);
+            transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        border-color 0.25s,
+                        background-color 0.25s;
+        }
+
+        body.cursor-hover #cursor-ring {
+            width: 62px;
+            height: 62px;
+            border-color: #E06D53;
+            background-color: rgba(229, 184, 105, 0.08);
+        }
+        body.cursor-hover #cursor-dot {
+            width: 5px;
+            height: 5px;
+            background: #E5B869;
+        }
+
+        @media (pointer: coarse) {
+            #cursor-dot, #cursor-ring { display: none !important; }
+        }
+
+        /* Glassmorphism */
+        .glass-obsidian {
+            background: rgba(18, 16, 14, 0.8);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-color: rgba(229, 184, 105, 0.16);
+        }
+
+        /* Molten Gold Text Gradient */
+        .text-molten {
+            background: linear-gradient(125deg, #FCE3B4 0%, #E5B869 45%, #E06D53 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 2. 3D Orbital Carousel Stage */
+        .orbital-viewport {
+            perspective: 1300px;
+            transform-style: preserve-3d;
+            user-select: none;
+            touch-action: pan-y;
+        }
+
+        .orbital-ring {
+            position: relative;
+            width: 100%;
+            height: 360px;
+            transform-style: preserve-3d;
+        }
+
+        .orbital-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 210px;
+            margin-left: -105px;
+            margin-top: -125px;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            will-change: transform, opacity;
+        }
+
+        @media (max-width: 640px) {
+            .orbital-ring { height: 310px; }
+            .orbital-node {
+                width: 165px;
+                margin-left: -82.5px;
+                margin-top: -105px;
+            }
+        }
+
+        @keyframes orbitRingSpin {
+            from { transform: rotateX(74deg) rotateZ(0deg); }
+            to { transform: rotateX(74deg) rotateZ(360deg); }
+        }
+        .gyro-halo {
+            animation: orbitRingSpin 26s linear infinite;
+        }
+
+        /* 3. Dual-Direction Opposing Kinetic Marquee Ribbons */
+        @keyframes marqueeLeft {
+            0% { transform: translate3d(0%, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        @keyframes marqueeRight {
+            0% { transform: translate3d(-50%, 0, 0); }
+            100% { transform: translate3d(0%, 0, 0); }
+        }
+        .track-left {
+            display: flex;
+            width: max-content;
+            animation: marqueeLeft 28s linear infinite;
+        }
+        .track-right {
+            display: flex;
+            width: max-content;
+            animation: marqueeRight 30s linear infinite;
+        }
+        .ribbon-wrap:hover .track-left,
+        .ribbon-wrap:hover .track-right {
+            animation-play-state: paused;
+        }
+
+        /* 4. Live Workshop Conveyor & Internal SVG Kinetic Animations */
+        @keyframes wheelSpin {
+            0% { transform: scaleX(1); }
+            50% { transform: scaleX(0.92); }
+            100% { transform: scaleX(1); }
+        }
+        @keyframes flameFlicker {
+            0%, 100% { transform: scaleY(1) skewX(0deg); opacity: 0.9; }
+            35% { transform: scaleY(1.14) skewX(-4deg); opacity: 1; }
+            70% { transform: scaleY(0.92) skewX(4deg); opacity: 0.8; }
+        }
+        @keyframes shuttleMove {
+            0%, 100% { transform: translateX(-22px); }
+            50% { transform: translateX(22px); }
+        }
+        @keyframes chiselTap {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            40% { transform: translate(-4px, 5px) rotate(-6deg); }
+        }
+
+        .anim-wheel { transform-origin: center; animation: wheelSpin 1.6s ease-in-out infinite; }
+        .anim-flame { transform-origin: bottom center; animation: flameFlicker 1.2s ease-in-out infinite; }
+        .anim-shuttle { animation: shuttleMove 2.2s ease-in-out infinite; }
+        .anim-chisel { transform-origin: top right; animation: chiselTap 1.4s ease-in-out infinite; }
+
+        /* 5. Staggered Floating Levitation & 3D Tilt Product Cards */
+        @keyframes cardLevitate {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+        .levitate-wrap {
+            animation: cardLevitate 5.4s ease-in-out infinite;
+        }
+        .levitate-wrap:nth-child(2n) { animation-delay: -1.4s; }
+        .levitate-wrap:nth-child(3n) { animation-delay: -2.8s; }
+        .levitate-wrap:nth-child(4n) { animation-delay: -4.1s; }
+        .levitate-wrap:hover { animation-play-state: paused; }
+
+        .tilt-card {
+            transform-style: preserve-3d;
+            transition: transform 0.22s ease-out, box-shadow 0.35s ease, border-color 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .tilt-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), rgba(229, 184, 105, 0.2), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .tilt-card::after {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: -60%;
+            width: 45%;
+            height: 300%;
+            background: linear-gradient(90deg, transparent, rgba(255, 240, 200, 0.12), transparent);
+            transform: rotate(25deg);
+            transition: left 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+            z-index: 3;
+        }
+        .tilt-card:hover::before { opacity: 1; }
+        .tilt-card:hover::after { left: 140%; }
+        .tilt-card:hover {
+            border-color: rgba(229, 184, 105, 0.55);
+            box-shadow: 0 26px 50px -15px rgba(0, 0, 0, 0.9), 0 0 30px -5px rgba(229, 184, 105, 0.18);
+        }
+
+        .craft-svg {
+            transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+        }
+        .tilt-card:hover .craft-svg {
+            transform: scale(1.1) rotate(-3deg) translateY(-4px);
+            filter: drop-shadow(0 12px 18px rgba(224, 109, 83, 0.32));
+        }
+
+        /* Shockwave Cart Ring Animation */
+        @keyframes shockwavePulse {
+            0% { transform: scale(0.85); opacity: 0.9; }
+            100% { transform: scale(2.35); opacity: 0; }
+        }
+        .shockwave-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            border: 2px solid #E5B869;
+            pointer-events: none;
+            animation: shockwavePulse 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* 6. SVG Stroke Line-Art Drawing Animation */
+        .draw-path {
+            stroke-dasharray: 460;
+            stroke-dashoffset: 460;
+            transition: stroke-dashoffset 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .draw-active .draw-path {
+            stroke-dashoffset: 0;
+        }
+
+        /* Scroll Reveal */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #070606; }
+        ::-webkit-scrollbar-thumb { background: #2D261F; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #E5B869; }
+    </style>
+    
+<style>
+    #filter-bar {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        border-radius: 18px !important;
+        gap: 8px !important;
+    }
+
+    #filter-bar #sliding-pill {
+        bottom: auto !important;
+    }
+</style>
+    
+</head>
+<body class="font-sans antialiased selection:bg-[#E5B869] selection:text-[#070606]">
+
+    <!-- 1. Custom Magnetic Trailing Cursor & Ambient Spotlight -->
+    <div id="pointer-spotlight"></div>
+    <div id="cursor-ring"></div>
+    <div id="cursor-dot"></div>
+
+    <!-- Ambient Rising Golden Sparks Canvas -->
+    <canvas id="sparks-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- Sticky Glassmorphic Header -->
+    <header class="glass-obsidian border-b sticky top-0 z-40">
+        <div class="w-full mx-auto px-6 sm:px-8 lg:px-10">
+            <div class="flex items-center justify-between h-20 gap-3">
+                
+                <!-- Brand Logo -->
+                <a href="#" onclick="filterCategory('All'); return false;" class="flex items-center gap-3.5 group shrink-0">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#E5B869] via-[#B8864B] to-[#E06D53] p-[1.5px] shadow-lg shadow-[#E5B869]/20 group-hover:rotate-12 transition-transform duration-500">
+                        <div class="w-full h-full rounded-[14px] bg-[#12100E] flex items-center justify-center">
+                            <svg class="w-5 h-5 text-[#E5B869]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M9 3h6M10 3v3c0 1.5-4 3-4 8 0 4.5 2.5 7 6 7s6-2.5 6-7c0-5-4-6.5-4-8V3M6.5 14h11"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="font-display text-xl sm:text-2xl font-bold tracking-wider text-[#F7F3EA] block leading-none">HANDCRAFT SHOP</span>
+                        <span class="text-[10px] uppercase tracking-[0.28em] text-[#E5B869] font-semibold">Kinetic Dark Atelier</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation -->
+               <nav class="hidden lg:flex items-center gap-10 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A69D90]">
+    <a href="#orbital-hero" class="hover:text-[#E5B869] transition-colors">3D Carousel</a>
+    <a href="#workshop-reel" class="hover:text-[#E5B869] transition-colors">Live Kiln Reel</a>
+    <a href="#gallery" class="hover:text-[#E5B869] transition-colors">Collection</a>
+    <a href="#craft-story" class="hover:text-[#E5B869] transition-colors">Craft Story</a>
+    <a href="login.html" class="hover:text-[#E5B869] transition-colors">Sign In</a>
+    <a href="customer.html" class="hover:text-[#E5B869] transition-colors">My Account</a>
+    <a href="seller.html" class="hover:text-[#E5B869] transition-colors">Sell With Us</a>
+</nav>
+
+                <!-- Search, Currency, Wishlist & Bag -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- Search Input -->
+                    <div class="relative hidden md:block w-48 xl:w-60">
+                        <i data-lucide="search" class="w-3.5 h-3.5 text-[#A69D90] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input 
+                            type="text" 
+                            id="search-input"
+                            list="search-suggestions"
+                            oninput="handleSearch(this.value)"
+                            placeholder="Search clay, brass, looms..." 
+                            class="w-full pl-9 pr-3 py-2 rounded-full text-xs bg-[#1A1613] text-[#F7F3EA] placeholder-[#7C7367] border border-[#E5B869]/20 focus:border-[#E5B869] focus:outline-none transition-all"
+                        >
+                        <datalist id="search-suggestions"></datalist>
+                    </div>
+
+                    <!-- Currency Toggle -->
+                    <button onclick="toggleCurrency()" class="px-3 py-2 rounded-full bg-[#1A1613] hover:border-[#E5B869]/60 border border-[#E5B869]/25 text-xs font-bold text-[#E5B869] flex items-center gap-1.5 transition-all" title="Switch Currency">
+                        <span id="currency-label">₹ INR</span>
+                        <i data-lucide="repeat" class="w-3 h-3 opacity-80"></i>
+                    </button>
+
+                    <!-- Wishlist Button -->
+                    <button onclick="toggleWishlistFilter()" id="wishlist-btn" class="relative p-2.5 rounded-full bg-[#1A1613] hover:border-[#E06D53] border border-[#E5B869]/25 text-[#F7F3EA] transition-all" title="Saved Heirlooms">
+                        <i data-lucide="heart" class="w-4 h-4 text-[#E06D53]"></i>
+                        <span id="wishlist-count" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#E06D53] text-[#070606] text-[10px] font-extrabold flex items-center justify-center">1</span>
+                    </button>
+
+                    <!-- Bag Button with Shockwave Container -->
+                    <button id="nav-cart-btn" onclick="toggleCart(true)" class="relative px-4 py-2.5 rounded-full bg-gradient-to-r from-[#E5B869] via-[#D4A152] to-[#E06D53] text-[#070606] font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-[#E5B869]/25 hover:brightness-110 transition-all active:scale-95">
+                        <span id="cart-shockwave-anchor" class="absolute inset-0 rounded-full pointer-events-none"></span>
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Bag</span>
+                        <span id="cart-count" class="w-5 h-5 rounded-full bg-[#070606] text-[#E5B869] text-[11px] font-bold flex items-center justify-center">2</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. HERO SECTION: Continuous 3D Orbital Product Carousel -->
+    <section id="orbital-hero" class="relative obsidian-bg pt-12 pb-20 sm:pt-16 sm:pb-24 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                
+                <!-- Left Editorial Copy & Active Orbital Readout -->
+                <div class="lg:col-span-5 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#1A1613] border border-[#E5B869]/35 text-[11px] font-bold uppercase tracking-[0.2em] text-[#E5B869]">
+                        <span class="w-2 h-2 rounded-full bg-[#E06D53] animate-ping"></span>
+                        3D Kinetic Gallery • Drag or Click Orbit
+                    </div>
+
+                    <h1 class="font-display text-4xl sm:text-5xl xl:text-6xl font-bold leading-[1.08] tracking-tight text-[#F7F3EA]">
+                        LIVING ART <br>
+                        <span class="text-molten">IN MOTION.</span>
+                    </h1>
+
+                    <p class="text-[#A69D90] text-sm sm:text-base leading-relaxed max-w-md mx-auto lg:mx-0">
+                        Experience rare heirloom handcrafts suspended in a continuous 3D orbit. Spin the carousel, inspect the kiln-fired textures, and acquire pieces forged by master guilds.
+                    </p>
+
+                    <!-- Live Active Orbital Piece Spotlight Card -->
+                    <div class="p-5 rounded-3xl bg-[#12100E]/90 border border-[#E5B869]/30 shadow-2xl backdrop-blur-md text-left transition-all">
+                        <div class="flex items-center justify-between text-[11px] uppercase tracking-wider text-[#B8864B] font-bold mb-1">
+                            <span id="orbit-active-cat">Ceramics • Kutch</span>
+                            <span id="orbit-active-index">01 / 05</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h2 id="orbit-active-title" class="font-serif text-2xl sm:text-3xl font-bold text-[#F7F3EA]">Terracotta Amphora</h2>
+                                <p id="orbit-active-price" class="text-lg font-extrabold text-[#E5B869] mt-0.5">₹2,850</p>
+                            </div>
+                            <button id="orbit-active-add" class="px-5 py-3 rounded-full bg-gradient-to-r from-[#E5B869] to-[#E06D53] text-[#070606] font-extrabold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 transition-all flex items-center justify-center gap-2 shrink-0">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                Add to Bag
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Orbital Controls -->
+                    <div class="flex items-center justify-center lg:justify-start gap-3 pt-1">
+                        <button onclick="stepOrbit(-1)" class="p-3 rounded-full bg-[#1A1613] hover:bg-[#E5B869] text-[#F7F3EA] hover:text-[#070606] border border-[#E5B869]/30 transition-all" title="Previous Piece">
+                            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                        </button>
+                        <button id="orbit-pause-btn" onclick="toggleOrbitPause()" class="px-5 py-3 rounded-full bg-[#1A1613] hover:border-[#E5B869] text-xs font-bold uppercase tracking-wider text-[#E5B869] border border-[#E5B869]/30 flex items-center gap-2 transition-all">
+                            <i id="orbit-pause-icon" data-lucide="pause" class="w-4 h-4"></i>
+                            <span id="orbit-pause-label">Auto-Orbiting</span>
+                        </button>
+                        <button onclick="stepOrbit(1)" class="p-3 rounded-full bg-[#1A1613] hover:bg-[#E5B869] text-[#F7F3EA] hover:text-[#070606] border border-[#E5B869]/30 transition-all" title="Next Piece">
+                            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right 3D Orbital Carousel Stage -->
+                <div class="lg:col-span-7 relative">
+                    <!-- Decorative Gyroscope Floor Halo -->
+                    <div class="absolute inset-x-10 bottom-2 h-44 flex items-center justify-center pointer-events-none">
+                        <div class="w-80 h-80 rounded-full border border-dashed border-[#E5B869]/30 gyro-halo"></div>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="w-72 h-72 rounded-full bg-gradient-to-tr from-[#E06D53]/25 via-[#E5B869]/20 to-transparent blur-3xl"></div>
+                    </div>
+
+                    <div id="orbital-viewport" class="orbital-viewport relative z-10 py-6">
+                        <div id="orbital-ring" class="orbital-ring">
+                            <!-- 5 Orbital Nodes injected by JS -->
+                        </div>
+                    </div>
+                    <p class="text-center text-[11px] uppercase tracking-[0.22em] text-[#A69D90] mt-2">
+                        Drag horizontally to spin • Hover to slow • Click any piece to focus
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Dual-Direction Opposing Kinetic Marquee Ribbons -->
+    <section class="ribbon-wrap relative py-8 overflow-hidden z-20 select-none">
+        <!-- Ribbon 1 (-2deg) -->
+        <div class="bg-gradient-to-r from-[#1A1511] via-[#241C15] to-[#1A1511] border-y border-[#E5B869]/35 py-3.5 -rotate-2 scale-105 shadow-2xl">
+            <div class="track-left flex items-center gap-10 font-display text-sm sm:text-base font-bold tracking-[0.24em] text-[#E5B869]">
+                <span>HAND-THROWN CERAMICS</span><span class="text-[#E06D53]">✦</span>
+                <span>HERITAGE LOOMS</span><span class="text-[#E06D53]">✦</span>
+                <span>KILN-FIRED</span><span class="text-[#E06D53]">✦</span>
+                <span>CARVED ROSEWOOD</span><span class="text-[#E06D53]">✦</span>
+                <span>FAIR TRADE ARTISANS</span><span class="text-[#E06D53]">✦</span>
+                <span>HAND-THROWN CERAMICS</span><span class="text-[#E06D53]">✦</span>
+                <span>HERITAGE LOOMS</span><span class="text-[#E06D53]">✦</span>
+                <span>KILN-FIRED</span><span class="text-[#E06D53]">✦</span>
+                <span>CARVED ROSEWOOD</span><span class="text-[#E06D53]">✦</span>
+                <span>FAIR TRADE ARTISANS</span><span class="text-[#E06D53]">✦</span>
+            </div>
+        </div>
+
+        <!-- Ribbon 2 (+2deg Opposing) -->
+        <div class="bg-gradient-to-r from-[#E06D53] via-[#C9583F] to-[#E06D53] border-y border-[#FCE3B4]/40 py-3 rotate-2 scale-105 -mt-2 shadow-xl">
+            <div class="track-right flex items-center gap-10 font-display text-xs sm:text-sm font-extrabold tracking-[0.26em] text-[#070606]">
+                <span>LOST-WAX BRONZE CASTING</span><span>❖</span>
+                <span>NATURAL INDIGO VATS</span><span>❖</span>
+                <span>SMALL-BATCH NUMBERED EDITIONS</span><span>❖</span>
+                <span>DIRECT MASTER GUILD PAY</span><span>❖</span>
+                <span>LOST-WAX BRONZE CASTING</span><span>❖</span>
+                <span>NATURAL INDIGO VATS</span><span>❖</span>
+                <span>SMALL-BATCH NUMBERED EDITIONS</span><span>❖</span>
+                <span>DIRECT MASTER GUILD PAY</span><span>❖</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Horizontal Conveyor Track: "The Artisan Workshop Reel" -->
+    <section id="workshop-reel" class="py-20 bg-[#0B0908] border-b border-[#E5B869]/15 relative z-10 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-[0.24em] text-[#E06D53] flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#E06D53] animate-pulse"></span>
+                    Live From The Kiln & Loom
+                </span>
+                <h2 class="font-display text-3xl sm:text-4xl font-bold text-[#F7F3EA] mt-1">The Artisan Workshop Reel</h2>
+            </div>
+            <p class="text-xs text-[#A69D90] max-w-sm">
+                Continuous kinetic conveyor synced with your scroll momentum. Hover any station to inspect the craft in motion.
+            </p>
+        </div>
+
+        <!-- Continuous Scroll-Velocity-Driven Conveyor Belt -->
+        <div class="w-full overflow-hidden py-2">
+            <div id="conveyor-track" class="flex gap-6 w-max will-change-transform px-4">
+                <!-- Populated & duplicated seamlessly by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Interactive Product Gallery with 3D Gyroscope Tilt & Levitation -->
+    <main id="gallery" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 relative z-10">
+        
+        <div class="reveal-up flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-[0.25em] text-[#E5B869]">Collector's Vault</span>
+                <h2 class="font-display text-3xl sm:text-5xl font-bold text-[#F7F3EA] mt-1">Heirloom Artifacts</h2>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <span id="product-count" class="text-xs sm:text-sm text-[#A69D90] mr-2">Showing 8 pieces</span>
+                <select id="sort-select" onchange="handleSort(this.value)" class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-[#12100E] text-[#F7F3EA] border border-[#E5B869]/30 focus:border-[#E5B869] focus:outline-none">
+                    <option value="featured">Sort: Curated Order</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="rating">Top Rated</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="reveal-up grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5 max-w-5xl">
+            <input id="material-filter" oninput="handleAdvancedFilters()" placeholder="Filter by material (wood, silver, resin...)" class="px-4 py-2.5 rounded-full text-xs bg-[#12100E] text-[#F7F3EA] border border-[#E5B869]/30 focus:outline-none">
+            <input id="min-price" type="number" min="0" oninput="handleAdvancedFilters()" placeholder="Minimum price ₹" class="px-4 py-2.5 rounded-full text-xs bg-[#12100E] text-[#F7F3EA] border border-[#E5B869]/30 focus:outline-none">
+            <input id="max-price" type="number" min="0" oninput="handleAdvancedFilters()" placeholder="Maximum price ₹" class="px-4 py-2.5 rounded-full text-xs bg-[#12100E] text-[#F7F3EA] border border-[#E5B869]/30 focus:outline-none">
+            <select id="rating-filter" onchange="handleAdvancedFilters()" class="px-4 py-2.5 rounded-full text-xs bg-[#12100E] text-[#F7F3EA] border border-[#E5B869]/30 focus:outline-none"><option value="">Any rating</option><option value="3">3 stars & above</option><option value="4">4 stars & above</option><option value="4.5">4.5 stars & above</option></select>
+        </div>
+
+        <!-- Category Filter Pills with Animated Sliding Active Indicator -->
+        
+        <div class="reveal-up relative flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-[#12100E] border border-[#E5B869]/25 mb-12 w-full" id="filter-bar">
+
+    <div id="sliding-pill" class="absolute rounded-full bg-gradient-to-r from-[#E5B869] to-[#E06D53] transition-all duration-300 ease-out pointer-events-none shadow-md"></div>
+
+    <button onclick="filterCategory('All', this)" data-cat="All" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-extrabold text-[#070606] transition-colors shrink-0">All</button>
+
+    <button onclick="filterCategory('Ceramics', this)" data-cat="Ceramics" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Ceramics</button>
+
+    <button onclick="filterCategory('Textiles', this)" data-cat="Textiles" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Textiles</button>
+
+    <button onclick="filterCategory('Woodwork', this)" data-cat="Woodwork" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Woodwork</button>
+
+    <button onclick="filterCategory('Brass & Copper', this)" data-cat="Brass & Copper" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Brass & Copper</button>
+
+    <button onclick="filterCategory('Silver Jewellery', this)" data-cat="Silver Jewellery" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Silver Jewellery</button>
+
+    <button onclick="filterCategory('Resin Art', this)" data-cat="Resin Art" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Resin Art</button>
+
+    <button onclick="filterCategory('Crochet & Macrame', this)" data-cat="Crochet & Macrame" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Crochet & Macrame</button>
+
+    <button onclick="filterCategory('Bags & Purses', this)" data-cat="Bags & Purses" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Bags & Purses</button>
+
+    <button onclick="filterCategory('Fashion Accessories', this)" data-cat="Fashion Accessories" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Fashion Accessories</button>
+
+    <button onclick="filterCategory('Home Decor', this)" data-cat="Home Decor" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Home Decor</button>
+
+    <button onclick="filterCategory('Artisan Jewellery', this)" data-cat="Artisan Jewellery" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Artisan Jewellery</button>
+
+    <button onclick="filterCategory('Paper Crafts', this)" data-cat="Paper Crafts" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Paper Crafts</button>
+
+    <button onclick="filterCategory('Paintings', this)" data-cat="Paintings" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Paintings</button>
+
+    <button onclick="filterCategory('Leatherwork', this)" data-cat="Leatherwork" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Leatherwork</button>
+
+    <button onclick="filterCategory('Other Handmade Crafts', this)" data-cat="Other Handmade Crafts" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Other Handmade Crafts</button>
+
+    <button onclick="filterCategory('Kitchen & Dining', this)" data-cat="Kitchen & Dining" class="cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0">Kitchen & Dining</button>
+
+</div>
+
+        <!-- 8-Item Levitating 3D Tilt Grid -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
+            <!-- Injected by JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-20 px-4 rounded-3xl bg-[#12100E] border border-[#E5B869]/25">
+            <i data-lucide="compass" class="w-10 h-10 text-[#E5B869] mx-auto mb-3"></i>
+            <h3 class="font-display text-2xl font-bold text-[#F7F3EA] mb-2">No Artifacts Found</h3>
+            <p class="text-sm text-[#A69D90] mb-6">Reset your filters to view our full collection of handmade heirlooms.</p>
+            <button onclick="resetFilters()" class="px-6 py-3 rounded-full bg-gradient-to-r from-[#E5B869] to-[#E06D53] text-[#070606] text-xs font-extrabold uppercase tracking-wider">Reset Gallery</button>
+        </div>
+    </main>
+
+    <!-- 6. Interactive "Craftsmanship & Story" Kinetic Tabs with SVG Line-Art Drawing -->
+    <section id="craft-story" class="py-20 sm:py-28 bg-[#0C0A09] border-t border-[#E5B869]/15 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal-up text-center max-w-2xl mx-auto mb-14">
+                <span class="text-xs font-bold uppercase tracking-[0.25em] text-[#E5B869]">Alchemy of Creation</span>
+                <h2 class="font-display text-3xl sm:text-5xl font-bold text-[#F7F3EA] mt-2">From Raw Earth to Your Home</h2>
+            </div>
+
+            <div class="reveal-up rounded-[2rem] bg-[#12100E] border border-[#E5B869]/25 p-6 sm:p-10 lg:p-14 shadow-2xl">
+                <!-- Interactive Step Switcher Tabs with Animated Progress Bar -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                    <button onclick="selectStoryStep(0)" id="story-tab-0" class="story-tab text-left p-5 rounded-2xl bg-[#1A1613] border border-[#E5B869] transition-all relative overflow-hidden">
+                        <div class="flex items-center justify-between text-xs font-bold text-[#E5B869] mb-1">
+                            <span>STAGE 01</span>
+                            <i data-lucide="mountain" class="w-4 h-4"></i>
+                        </div>
+                        <h3 class="font-display text-lg font-bold text-[#F7F3EA]">Raw Earth & Ore</h3>
+                        <p class="text-xs text-[#A69D90] mt-1">Riverbank clay, organic cotton & raw bell-metal alloys.</p>
+                        <div class="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#E5B869] to-[#E06D53] transition-all duration-500" id="story-bar-0" style="width: 100%;"></div>
+                    </button>
+
+                    <button onclick="selectStoryStep(1)" id="story-tab-1" class="story-tab text-left p-5 rounded-2xl bg-[#161311] border border-white/10 hover:border-[#E5B869]/40 transition-all relative overflow-hidden">
+                        <div class="flex items-center justify-between text-xs font-bold text-[#A69D90] mb-1">
+                            <span>STAGE 02</span>
+                            <i data-lucide="flame" class="w-4 h-4 text-[#E06D53]"></i>
+                        </div>
+                        <h3 class="font-display text-lg font-bold text-[#F7F3EA]">Master Hands & Kiln</h3>
+                        <p class="text-xs text-[#A69D90] mt-1">Wood-fired reduction, pit-looming & lost-wax casting.</p>
+                        <div class="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#E5B869] to-[#E06D53] transition-all duration-500" id="story-bar-1" style="width: 0%;"></div>
+                    </button>
+
+                    <button onclick="selectStoryStep(2)" id="story-tab-2" class="story-tab text-left p-5 rounded-2xl bg-[#161311] border border-white/10 hover:border-[#E5B869]/40 transition-all relative overflow-hidden">
+                        <div class="flex items-center justify-between text-xs font-bold text-[#A69D90] mb-1">
+                            <span>STAGE 03</span>
+                            <i data-lucide="home" class="w-4 h-4 text-[#E5B869]"></i>
+                        </div>
+                        <h3 class="font-display text-lg font-bold text-[#F7F3EA]">Your Sanctuary</h3>
+                        <p class="text-xs text-[#A69D90] mt-1">Signed provenance, zero-plastic crates & 72% direct guild pay.</p>
+                        <div class="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#E5B869] to-[#E06D53] transition-all duration-500" id="story-bar-2" style="width: 0%;"></div>
+                    </button>
+                </div>
+
+                <!-- Kinetic Stage Content + Animated Stroke-Dashoffset Line-Art SVG -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div class="lg:col-span-5"> -
+                        <div id="story-svg-stage" class="rounded-3xl bg-[#070606] border border-[#E5B869]/20 p-8 flex items-center justify-center min-h-[260px] draw-active">
+                            <!-- Animated Line-Art SVG injected by JS -->
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5">
+                    <div class="lg:col-span-5 relative rounded-3xl overflow-hidden min-h-[500px] border border-[#E5B869]/20">
+    <iframe
+        src="Animation/pottery-animation.html"
+        class="w-full h-full absolute inset-0"
+        style="border: none;"
+        title="3D Artisan Pottery Animation">
+    </iframe>
+</div>
+</div>
+                    <div class="lg:col-span-7 space-y-5">
+                        <span id="story-badge" class="inline-block px-3.5 py-1 rounded-full bg-[#E06D53]/15 border border-[#E06D53]/40 text-[#E06D53] text-xs font-bold uppercase tracking-wider">
+                            Ethical Sourcing • 100% Natural
+                        </span>
+                        <h3 id="story-heading" class="font-serif text-3xl sm:text-4xl font-bold text-[#F7F3EA]">
+                            Harvested Without Harm, Aged by Nature
+                        </h3>
+                        <p id="story-body" class="text-[#A69D90] text-sm sm:text-base leading-relaxed">
+                            Our artisans begin at dawn along mineral-rich riverbeds and organic rain-fed cotton fields. Clay is cured for weeks in underground pits, while brass alloys are smelted from pure copper and tin without synthetic coatings.
+                        </p>
+                        <div class="grid grid-cols-3 gap-4 pt-3 border-t border-[#E5B869]/15">
+                            <div>
+                                <span id="story-stat-1-val" class="font-display text-2xl font-bold text-[#E5B869]">21 Days</span>
+                                <span id="story-stat-1-lbl" class="block text-[11px] text-[#A69D90]">Clay Curing Cycle</span>
+                            </div>
+                            <div>
+                                <span id="story-stat-2-val" class="font-display text-2xl font-bold text-[#F7F3EA]">Zero</span>
+                                <span id="story-stat-2-lbl" class="block text-[11px] text-[#A69D90]">Chemical Glazes</span>
+                            </div>
+                            <div>
+                                <span id="story-stat-3-val" class="font-display text-2xl font-bold text-[#E06D53]">48+</span>
+                                <span id="story-stat-3-lbl" class="block text-[11px] text-[#A69D90]">Partner Villages</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#070606] border-t border-[#E5B869]/15 py-14 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#E5B869] to-[#E06D53] flex items-center justify-center text-[#070606]">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                <span class="font-display text-xl font-bold tracking-wider text-[#F7F3EA]">HANDCRAFT SHOP</span>
+            </div>
+            <p class="text-xs text-[#A69D90] text-center">© 2026 HANDCRAFT SHOP • Kinetic Dark Artisanal Atelier. Fair Trade & Plastic-Free.</p>
+            <div class="flex items-center gap-5 text-xs font-semibold text-[#E5B869]">
+                <a href="#orbital-hero" class="hover:underline">Top Orbit ↑</a>
+                <a href="#gallery" class="hover:underline">Gallery</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 7A. Quick-View Modal with Interactive 360° Drag-Rotation Preview -->
+    <div id="quick-view-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="bg-[#12100E] border border-[#E5B869]/35 rounded-[2rem] max-w-2xl w-full overflow-hidden shadow-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <!-- 360 Drag Stage -->
+                <div id="qv-360-stage" class="bg-gradient-to-br from-[#1E1915] to-[#0B0908] p-6 flex flex-col items-center justify-between min-h-[290px] relative select-none touch-none">
+                    <div class="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-[#E5B869] font-bold">
+                        <span class="flex items-center gap-1"><i data-lucide="rotate-3d" class="w-3.5 h-3.5"></i> 360° Drag Inspect</span>
+                        <span id="qv-angle-readout">0°</span>
+                    </div>
+                    <div id="qv-visual" class="my-auto transition-transform duration-75" style="transform-style: preserve-3d;">
+                        <!-- SVG injected -->
+                    </div>
+                    <p class="text-[10px] text-[#A69D90]">Drag left or right to rotate artifact</p>
+                </div>
+
+                <!-- Details -->
+                <div class="p-6 sm:p-8 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between gap-2">
+                            <span id="qv-origin" class="px-3 py-1 rounded-full bg-[#E5B869]/15 border border-[#E5B869]/30 text-[#E5B869] text-[11px] font-bold">Origin</span>
+                            <button onclick="closeQuickView()" class="p-1.5 rounded-full hover:bg-white/10 text-[#A69D90] hover:text-white">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <h3 id="qv-title" class="font-serif text-3xl font-bold text-[#F7F3EA] mt-3">Product</h3>
+                        <p id="qv-price" class="text-xl font-extrabold text-[#E5B869] mt-1">₹0</p>
+                        <p id="qv-desc" class="text-[#A69D90] text-xs sm:text-sm leading-relaxed mt-3">Description</p>
+                        <div class="mt-4 pt-3 border-t border-[#E5B869]/15 space-y-2 text-xs text-[#A69D90]">
+                            <p id="qv-artisan" class="flex items-center gap-2"><i data-lucide="award" class="w-4 h-4 text-[#E5B869]"></i><span>Guild</span></p>
+                            <p id="qv-dimensions" class="flex items-center gap-2"><i data-lucide="ruler" class="w-4 h-4 text-[#E06D53]"></i><span>Dimensions</span></p>
+                        </div>
+                        <div id="qv-reviews" class="mt-4 pt-3 border-t border-[#E5B869]/15 text-xs text-[#A69D90]">Loading customer reviews…</div>
+                    </div>
+                    <button id="qv-add-btn" class="mt-6 w-full py-3.5 rounded-full bg-gradient-to-r from-[#E5B869] to-[#E06D53] text-[#070606] font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:brightness-110 transition-all">
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        Add Artifact to Bag
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7B. Glassmorphic Slide-Out Shopping Bag Drawer -->
+    <div id="cart-backdrop" onclick="toggleCart(false)" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs hidden"></div>
+    <aside id="cart-drawer" class="fixed top-0 right-0 z-50 h-full w-full max-w-md glass-obsidian border-l border-[#E5B869]/30 shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col">
+        <div class="p-6 border-b border-[#E5B869]/15 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="shopping-bag" class="w-5 h-5 text-[#E5B869]"></i>
+                <h3 class="font-display text-lg font-bold text-[#F7F3EA]">Collector's Bag</h3>
+                <span id="drawer-badge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#E5B869]/20 text-[#E5B869] font-bold">2 items</span>
+            </div>
+            <button onclick="toggleCart(false)" class="p-2 rounded-full hover:bg-white/10 text-[#A69D90] hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Animated Free Shipping Progress Bar -->
+        <div class="px-6 py-3.5 bg-[#181512] border-b border-[#E5B869]/15 text-xs">
+            <div class="flex items-center justify-between mb-2">
+                <span id="shipping-text" class="text-[#F7F3EA]">Free Insured Crate Shipping Unlocked!</span>
+                <i data-lucide="sparkles" class="w-4 h-4 text-[#E5B869]"></i>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div id="shipping-progress" class="h-full rounded-full bg-gradient-to-r from-[#E5B869] to-[#E06D53] transition-all duration-500" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Cart Items -->
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+
+        <!-- Cart Footer -->
+        <div id="cart-footer" class="p-6 border-t border-[#E5B869]/20 bg-[#0D0B0A] space-y-4">
+            <div class="space-y-1.5 text-sm">
+                <div class="flex justify-between text-[#A69D90]">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal" class="font-bold text-[#F7F3EA]">₹0</span>
+                </div>
+                <div class="flex justify-between text-[#A69D90]">
+                    <span>Zero-Plastic Wooden Crate</span>
+                    <span class="text-[#E5B869] font-semibold">Complimentary</span>
+                </div>
+                <div class="flex justify-between text-base font-bold pt-2 border-t border-[#E5B869]/15 text-[#F7F3EA]">
+                    <span>Total</span>
+                    <span id="cart-total" class="font-display text-xl text-[#E5B869]">₹0</span>
+                </div>
+            </div>
+            <button onclick="triggerCheckoutCelebration()" class="w-full py-3.5 rounded-full bg-gradient-to-r from-[#E5B869] to-[#E06D53] text-[#070606] font-extrabold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                <span>Complete Acquisition</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Checkout Celebration Modal + Embers Confetti Canvas -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+        <canvas id="confetti-canvas" class="fixed inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="relative z-10 bg-[#12100E] border border-[#E5B869]/45 rounded-[2rem] max-w-md w-full p-8 text-center shadow-2xl space-y-5">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[#E5B869]/30 to-[#E06D53]/30 border border-[#E5B869] flex items-center justify-center mx-auto text-[#E5B869]">
+                <i data-lucide="check-circle-2" class="w-9 h-9"></i>
+            </div>
+            <h3 class="font-display text-2xl sm:text-3xl font-bold text-[#F7F3EA]">Acquisition Confirmed</h3>
+            <p class="text-[#A69D90] text-xs sm:text-sm leading-relaxed">
+                Order <strong class="text-[#E5B869]">#HS-8829</strong> is dispatched to our master artisan guilds. A signed certificate of provenance will accompany your heirloom.
+            </p>
+            <button onclick="closeCheckout()" class="w-full py-3.5 rounded-full bg-gradient-to-r from-[#E5B869] to-[#E06D53] text-[#070606] font-extrabold text-xs uppercase tracking-wider">
+                Continue Exploring
+            </button>
+        </div>
+    </div>
+
+    <!-- Golden Toast -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full bg-[#181512] border border-[#E5B869]/50 text-[#F7F3EA] text-xs font-semibold shadow-2xl flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-4">
+        <i data-lucide="sparkles" class="w-4 h-4 text-[#E5B869]"></i>
+        <span id="toast-msg">Added to bag</span>
+    </div>
+
+    <script>
+        // 8 Curated Artisanal Products across Ceramics, Textiles, Woodwork & Brass
+        let products = [
+            {
+                id: 1,
+                name: "Terracotta Amphora",
+                category: "Ceramics",
+                origin: "Kutch, Gujarat",
+                artisan: "Rameshbhai Smoke-Kiln Guild",
+                priceINR: 2850,
+                priceUSD: 36,
+                dimensions: "H: 30 cm × D: 17 cm",
+                badge: "Kiln-Fired",
+                description: "Wheel-thrown red river clay fired in a sawdust reduction kiln for an obsidian sheen and hand-inlaid with molten gold mineral slip.",
+                svg: `<svg viewBox="0 0 200 200" class="w-36 h-36 craft-svg" fill="none">
+                        <circle cx="100" cy="105" r="68" fill="#E5B869" opacity="0.09"/>
+                        <path d="M80 40H120L116 58C138 72 146 105 138 142C133 160 122 172 122 172H78C78 172 67 160 62 142C54 105 62 72 84 58L80 40Z" fill="#2A201B" stroke="#E06D53" stroke-width="2.2"/>
+                        <path d="M81 55C63 55 58 82 70 93M119 55C137 55 142 82 130 93" stroke="#E06D53" stroke-width="4.5" stroke-linecap="round"/>
+                        <path d="M64 112Q82 102 100 112T136 112" stroke="#E5B869" stroke-width="2.4" stroke-linecap="round"/>
+                        <path d="M63 126Q82 116 100 126T137 126" stroke="#F7F3EA" stroke-width="1.5" stroke-dasharray="3 5" opacity="0.75"/>
+                      </svg>`
+            },
+            {
+                id: 2,
+                name: "Hand-Loomed Tapestry",
+                category: "Textiles",
+                origin: "Bhujodi, Kutch",
+                artisan: "Vankar Shamji Weaver Guild",
+                priceINR: 3950,
+                priceUSD: 49,
+                dimensions: "135 cm × 190 cm",
+                badge: "Pit-Loomed",
+                description: "Hand-spun organic Kala cotton dyed in iron-black and madder terracotta, woven on heritage pit looms with raw antique Zari threads.",
+                svg: `<svg viewBox="0 0 200 200" class="w-36 h-36 craft-svg" fill="none">
+                        <circle cx="100" cy="105" r="68" fill="#E06D53" opacity="0.1"/>
+                        <rect x="48" y="48" width="104" height="102" rx="10" fill="#1C1815" stroke="#E5B869" stroke-width="2"/>
+                        <rect x="48" y="70" width="104" height="14" fill="#E06D53"/>
+                        <rect x="48" y="114" width="104" height="10" fill="#E5B869"/>
+                        <path d="M58 98L68 89L78 98L88 89L98 98L108 89L118 98L128 89L138 98" stroke="#F7F3EA" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M58 150V165M72 150V165M86 150V165M100 150V165M114 150V165M128 150V165M142 150V165" stroke="#E5B869" stroke-width="2" stroke-linecap="round"/>
+                      </svg>`
+            },
+            {
+                id: 3,
+                name: "Brass Singing Bowl",
+                category: "Brass",
+                origin: "Moradabad, UP",
+                artisan: "Thathera Master Smiths",
+                priceINR: 3400,
+                priceUSD: 43,
+                dimensions: "D: 22 cm × H: 11 cm",
+                badge: "Hand-Hammered",
+                description: "Forged from a seven-metal bell alloy and hand-hammered over charcoal fires to produce deep harmonic resonance and a burnished gold patina.",
+                svg: `<svg viewBox="0 0 200 200" class="w-36 h-36 craft-svg" fill="none">
+                        <circle cx="100" cy="108" r="68" fill="#E5B869" opacity="0.14"/>
+                        <path d="M40 94H160C156 136 132 156 100 156C68 156 44 136 40 94Z" fill="#B8864B" stroke="#FCE3B4" stroke-width="2"/>
+                        <ellipse cx="100" cy="94" rx="60" ry="11" fill="#E5B869" stroke="#FCE3B4" stroke-width="1.5"/>
+                        <path d="M54 116C78 126 122 126 146 116" stroke="#FCE3B4" stroke-width="1.6" stroke-dasharray="3 4"/>
+                        <line x1="128" y1="62" x2="168" y2="112" stroke="#593A25" stroke-width="7" stroke-linecap="round"/>
+                      </svg>`
+            },
+            {
+                id: 4,
+                name: "Carved Rosewood Box",
+                category: "Woodwork",
+                origin: "Saharanpur, UP",
+                artisan: "Zafar Heritage Joinery",
+                priceINR: 3150,
+                priceUSD: 40,
+                dimensions: "26 cm × 16 cm × 11 cm",
+                badge: "Chiseled Relief",
+                description: "Seasoned dark Indian rosewood hand-carved with botanical jaali filigree and inlaid with antique brass corners and velvet interior.",
+                svg: `<svg viewBox="0 0 200 200" class="w-36 h-36 craft-svg" fill="none">
+                        <circle cx="100" cy="105" r="68" fill="#E5B869" opacity="0.09"/>
+                        <rect x="42" y="96" width="116" height="52" rx="8" fill="#3B2316" stroke="#E5B869" stroke-width="2"/>
+                        <path d="M38 96L52 72H148L162 96H38Z" fill="#52311F" stroke="#E5B869" stroke-width="2"/>
+                        <rect x="92" y="90" width="16" height="16" rx="3" fill="#E5B869"/>
+                        <path d="M56 122H144" stroke="#E06D53" stroke-width="2" stroke-dasharray="4 4"/>
+                      </svg>`
+            },
+            {
+                id: 5,
+                name: "Glazed Celadon Teapot",
+                category: "Ceramics",
+                origin: "Jaipur, Rajasthan",
+                artisan: "Sanganer Studio Kiln",
+                priceINR: 2650,
+                priceUSD: 34,
+                dimensions: "H: 16 cm × W: 21 cm",
+                badge: "Crackle Glaze",
+                description: "High-fired stoneware finished in deep jade-celadon ash glaze with a hand-bent oxidized brass handle and precision drip-free spout.",
+                svg: `<svg viewBox="0 0 200 200" class="w-36 h-36 craft-svg" fill="none">
+                        <circle cx="100" cy="110" r="68" fill="#5F8D7E" opacity="0.14"/>
+                        <path d="M64 114C64 88 80 78 100 78C120 78 136 88 136 114C136 140 120 152 100 152C80 152 64 140 64 114Z" fill="#2E4A42" stroke="#E5B869" stroke-width="2"/>
+                        <path d="M134 108C152 104 162 92 164 82" stroke="#2E4A42" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M72 82C72 52 128 52 128 82" stroke="#E5B869" stroke-width="3" fill="none"/>
+                        <circle cx="100" cy="72" r="6" fill="#E5B869"/>
+                      </svg>`
+            },
+            {
+                id: 6,
+                name: "Bastar Dhokra Totem",
+                category: "Brass",
+                origin: "Bastar, Chhattisgarh",
+                artisan: "Ghadwa Lost-Wax Guild",
+                priceINR: 3650,
+                priceUSD: 46,
+                dimensions: "H: 24 cm × W: 14 cm",
+                badge: "Lost-Wax Cast",
+                description: "Cast using the 4,000-year-old lost-wax process, capturing hand-rolled beeswax filigree permanently in raw antique bronze.",
+                svg: `<svg viewBox="0 0 200 200" class="w-36 h-36 craft-svg" fill="none">
+                        <circle cx="100" cy="105" r="68" fill="#E5B869" opacity="0.12"/>
+                        <rect x="66" y="152" width="68" height="10" rx="4" fill="#5C4024" stroke="#E5B869" stroke-width="1.4"/>
+                        <ellipse cx="100" cy="112" rx="28" ry="34" fill="#8C6229" stroke="#FCE3B4" stroke-width="1.8"/>
+                        <circle cx="100" cy="64" r="14" fill="#8C6229" stroke="#FCE3B4" stroke-width="1.8"/>
+                        <path d="M88 52C78 38 70 44 76 54M112 52C122 38 130 44 124 54" stroke="#E5B869" stroke-width="2.5" stroke-linecap="round"/>
+                      </svg>`
+            },
+            {
+                id: 7,
+                name: "Bagru Mud-Resist Cushions",
+                category: "Textiles",
+                origin: "Bagru, Rajasthan",
+                artisan: "Chhipa Dabu Printers",
+                priceINR: 1950,
+                priceUSD: 25,
+                dimensions: "45 cm × 45 cm (Pair)",
+                badge: "Dabu Indigo",
+                description: "Hand-stamped using carved teak blocks and river-mud resist paste before immersion in fermented natural indigo vats.",
+                svg: `<svg viewBox="0 0 200 200" class="w-36 h-36 craft-svg" fill="none">
+                        <circle cx="100" cy="105" r="68" fill="#E06D53" opacity="0.1"/>
+                        <rect x="48" y="56" width="104" height="96" rx="14" fill="#182430" stroke="#E5B869" stroke-width="2"/>
+                        <rect x="60" y="68" width="80" height="72" rx="8" stroke="#E5B869" stroke-width="1.5" stroke-dasharray="4 4"/>
+                        <circle cx="100" cy="104" r="18" stroke="#E06D53" stroke-width="2.4"/>
+                        <path d="M100 80V128M76 104H124" stroke="#F7F3EA" stroke-width="1.8" stroke-linecap="round"/>
+                      </svg>`
+            },
+            {
+                id: 8,
+                name: "Kashmiri Walnut Bowl",
+                category: "Woodwork",
+                origin: "Srinagar, Kashmir",
+                artisan: "Mir Woodcarving Atelier",
+                priceINR: 2950,
+                priceUSD: 38,
+                dimensions: "D: 25 cm × H: 10 cm",
+                badge: "Single-Block",
+                description: "Turned and chiseled from a single block of aged Himalayan walnut with deep chinar-leaf relief and organic beeswax luster.",
+                svg: `<svg viewBox="0 0 200 200" class="w-36 h-36 craft-svg" fill="none">
+                        <circle cx="100" cy="105" r="68" fill="#E5B869" opacity="0.09"/>
+                        <path d="M36 94H164C164 134 135 158 100 158C65 158 36 134 36 94Z" fill="#3B2618" stroke="#E5B869" stroke-width="2"/>
+                        <ellipse cx="100" cy="94" rx="64" ry="11" fill="#593A25" stroke="#E5B869" stroke-width="1.3"/>
+                        <path d="M54 118C78 128 122 128 146 118" stroke="#E5B869" stroke-width="2" stroke-linecap="round"/>
+                      </svg>`
+            }
+        ];
+
+        // Live Workshop Conveyor Stations with Internal Animated SVGs
+        const workshopStations = [
+            {
+                title: "Pottery Wheel Spinning",
+                location: "Kutch Clay Studio",
+                temp: "980°C Sawdust Kiln",
+                svg: `<svg viewBox="0 0 160 120" class="w-32 h-24" fill="none">
+                        <ellipse cx="80" cy="98" rx="56" ry="10" fill="#2A241E" stroke="#E5B869" stroke-width="1.2"/>
+                        <g class="anim-wheel">
+                            <path d="M62 42H98L94 56C108 66 112 82 104 94H56C48 82 52 66 66 56L62 42Z" fill="#E06D53" stroke="#FCE3B4" stroke-width="1.5"/>
+                        </g>
+                      </svg>`
+            },
+            {
+                title: "Molten Brass Casting",
+                location: "Bastar Foundry",
+                temp: "1,050°C Crucible",
+                svg: `<svg viewBox="0 0 160 120" class="w-32 h-24" fill="none">
+                        <path d="M52 54H108L100 96H60L52 54Z" fill="#2D231B" stroke="#E5B869" stroke-width="1.6"/>
+                        <g class="anim-flame">
+                            <path d="M80 18C94 34 98 48 80 54C62 48 66 34 80 18Z" fill="#E06D53"/>
+                            <path d="M80 28C88 38 90 46 80 50C70 46 72 38 80 28Z" fill="#E5B869"/>
+                        </g>
+                      </svg>`
+            },
+            {
+                title: "Natural Indigo Looming",
+                location: "Bhujodi Pit-Loom",
+                temp: "100% Organic Kala Cotton",
+                svg: `<svg viewBox="0 0 160 120" class="w-32 h-24" fill="none">
+                        <line x1="25" y1="42" x2="135" y2="42" stroke="#E5B869" stroke-width="1.5" stroke-dasharray="4 4"/>
+                        <line x1="25" y1="62" x2="135" y2="62" stroke="#E06D53" stroke-width="2"/>
+                        <line x1="25" y1="82" x2="135" y2="82" stroke="#E5B869" stroke-width="1.5" stroke-dasharray="4 4"/>
+                        <g class="anim-shuttle">
+                            <path d="M58 62L70 54H90L102 62L90 70H70L58 62Z" fill="#FCE3B4" stroke="#E06D53" stroke-width="1.5"/>
+                        </g>
+                      </svg>`
+            },
+            {
+                title: "Rosewood Hand Chiseling",
+                location: "Saharanpur Guild",
+                temp: "Seasoned 12-Yr Timber",
+                svg: `<svg viewBox="0 0 160 120" class="w-32 h-24" fill="none">
+                        <rect x="34" y="76" width="92" height="24" rx="5" fill="#3B2316" stroke="#E5B869" stroke-width="1.5"/>
+                        <g class="anim-chisel">
+                            <line x1="115" y1="24" x2="78" y2="72" stroke="#E5B869" stroke-width="5" stroke-linecap="round"/>
+                            <path d="M78 72L72 78" stroke="#FCE3B4" stroke-width="3" stroke-linecap="round"/>
+                        </g>
+                      </svg>`
+            }
+        ];
+
+        // 3-Stage Craftsmanship Story Data
+        const storySteps = [
+            {
+                badge: "Ethical Sourcing • 100% Natural",
+                heading: "Harvested Without Harm, Aged by Nature",
+                body: "Our artisans begin at dawn along mineral-rich riverbeds and organic rain-fed cotton fields. Clay is cured for weeks in underground pits, while brass alloys are smelted from pure copper and tin without synthetic coatings.",
+                stats: [
+                    { val: "21 Days", lbl: "Clay Curing Cycle" },
+                    { val: "Zero", lbl: "Chemical Glazes" },
+                    { val: "48+", lbl: "Partner Villages" }
+                ],
+                svg: `<svg viewBox="0 0 240 200" class="w-56 h-44" fill="none">
+                        <path class="draw-path" d="M20 150 Q75 95 130 140 T220 125" stroke="#E5B869" stroke-width="2.5" stroke-linecap="round"/>
+                        <path class="draw-path" d="M35 168 Q120 135 205 168" stroke="#E06D53" stroke-width="2" stroke-linecap="round"/>
+                        <circle class="draw-path" cx="120" cy="68" r="32" stroke="#FCE3B4" stroke-width="2"/>
+                      </svg>`
+            },
+            {
+                badge: "Master Guilds • Wood-Kiln & Pit-Loom",
+                heading: "Shaped by Muscle Memory & Fire",
+                body: "Every curve is thrown by hand on stone wheels, beaten with thousands of rhythmic hammer blows, or woven on century-old pit looms. Sawdust reduction firing imparts our signature obsidian and molten bronze patina.",
+                stats: [
+                    { val: "1,020°C", lbl: "Reduction Firing" },
+                    { val: "4,000 Yr", lbl: "Lost-Wax Lineage" },
+                    { val: "1-of-1", lbl: "Unique Patina" }
+                ],
+                svg: `<svg viewBox="0 0 240 200" class="w-56 h-44" fill="none">
+                        <path class="draw-path" d="M88 36H152L144 62C174 82 184 126 168 164H72C56 126 66 82 96 62L88 36Z" stroke="#E5B869" stroke-width="2.6"/>
+                        <path class="draw-path" d="M74 114Q120 130 166 114" stroke="#E06D53" stroke-width="2.5"/>
+                        <path class="draw-path" d="M86 56C64 56 58 88 74 100M154 56C176 56 182 88 166 100" stroke="#FCE3B4" stroke-width="2.2"/>
+                      </svg>`
+            },
+            {
+                badge: "Direct Impact • Plastic-Free Transit",
+                heading: "Signed Provenance in Your Sanctuary",
+                body: "72% of every acquisition flows directly to the maker's family workshop. Your artifact arrives cushioned in biodegradable mycelium and upcycled cotton inside a custom wooden crate with a signed artisan card.",
+                stats: [
+                    { val: "72%", lbl: "Direct Artisan Share" },
+                    { val: "0%", lbl: "Single-Use Plastic" },
+                    { val: "Insured", lbl: "Global Crate Transit" }
+                ],
+                svg: `<svg viewBox="0 0 240 200" class="w-56 h-44" fill="none">
+                        <path class="draw-path" d="M45 96L120 38L195 96V168H45V96Z" stroke="#E5B869" stroke-width="2.5"/>
+                        <rect class="draw-path" x="98" y="114" width="44" height="54" stroke="#E06D53" stroke-width="2.2"/>
+                        <circle class="draw-path" cx="120" cy="78" r="12" stroke="#FCE3B4" stroke-width="2"/>
+                      </svg>`
+            }
+        ];
+
+        // Global App State
+        let state = {
+            currency: 'INR',
+            category: 'All',
+            searchQuery: '',
+            materialQuery: '',
+            minPrice: '',
+            maxPrice: '',
+            minRating: '',
+            sortBy: 'featured',
+            wishlistOnly: false,
+            wishlist: [3],
+            cart: [],
+            // 3D Orbital Carousel State
+            orbitAngle: 0,
+            orbitTargetAngle: null,
+            orbitPaused: false,
+            orbitHovering: false,
+            orbitDragging: false,
+            orbitDragStartX: 0,
+            orbitDragStartAngle: 0,
+            activeOrbitIdx: 0
+        };
+
+        const FREE_SHIP_INR = 3500;
+        const FREE_SHIP_USD = 45;
+
+        function formatMoney(itemOrVal, isRaw = false) {
+            if (isRaw) {
+                return state.currency === 'INR'
+                    ? `₹${itemOrVal.toLocaleString('en-IN')}`
+                    : `$${itemOrVal.toLocaleString('en-US')}`;
+            }
+            return state.currency === 'INR'
+                ? `₹${itemOrVal.priceINR.toLocaleString('en-IN')}`
+                : `$${itemOrVal.priceUSD.toLocaleString('en-US')}`;
+        }
+
+        function getUnitVal(product) {
+            return state.currency === 'INR' ? product.priceINR : product.priceUSD;
+        }
+
+        /* =========================================================
+           1. MAGNETIC TRAILING CURSOR & AMBIENT SPOTLIGHT (LERP)
+        ========================================================= */
+        function initMagneticCursor() {
+            const dot = document.getElementById('cursor-dot');
+            const ring = document.getElementById('cursor-ring');
+            const spotlight = document.getElementById('pointer-spotlight');
+
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let ringX = mouseX;
+            let ringY = mouseY;
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                dot.style.left = `${mouseX}px`;
+                dot.style.top = `${mouseY}px`;
+                spotlight.style.setProperty('--spot-x', `${mouseX}px`);
+                spotlight.style.setProperty('--spot-y', `${mouseY}px`);
+            });
+
+            document.addEventListener('mouseover', (e) => {
+                if (e.target.closest('button, a, select, input, .tilt-card, .orbital-node')) {
+                    document.body.classList.add('cursor-hover');
+                }
+            });
+            document.addEventListener('mouseout', (e) => {
+                if (e.target.closest('button, a, select, input, .tilt-card, .orbital-node')) {
+                    document.body.classList.remove('cursor-hover');
+                }
+            });
+
+            function loopCursor() {
+                ringX += (mouseX - ringX) * 0.16;
+                ringY += (mouseY - ringY) * 0.16;
+                ring.style.left = `${ringX}px`;
+                ring.style.top = `${ringY}px`;
+                requestAnimationFrame(loopCursor);
+            }
+            loopCursor();
+        }
+
+        /* =========================================================
+           2. HERO 3D ORBITAL PRODUCT CAROUSEL (5 HERO PIECES)
+        ========================================================= */
+        const orbitItems = products.slice(0, 5);
+
+        function initOrbitalCarousel() {
+            const ring = document.getElementById('orbital-ring');
+            const viewport = document.getElementById('orbital-viewport');
+
+            ring.innerHTML = orbitItems.map((item, idx) => `
+                <div 
+                    data-orbit-idx="${idx}"
+                    onclick="focusOrbitItem(${idx})"
+                    class="orbital-node rounded-3xl bg-gradient-to-b from-[#1D1814] to-[#100E0C] border border-[#E5B869]/30 p-4 flex flex-col items-center text-center shadow-2xl cursor-pointer"
+                >
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#E5B869]/15 text-[#E5B869] text-[9px] font-bold uppercase tracking-wider mb-1">
+                        ${item.badge}
+                    </span>
+                    <div class="my-1 pointer-events-none">${item.svg}</div>
+                    <h4 class="font-serif text-base font-bold text-[#F7F3EA] leading-tight line-clamp-1">${item.name}</h4>
+                    <span class="text-xs font-extrabold text-[#E5B869] mt-0.5">${formatMoney(item)}</span>
+                </div>
+            `).join('');
+
+            viewport.addEventListener('mouseenter', () => { state.orbitHovering = true; });
+            viewport.addEventListener('mouseleave', () => { state.orbitHovering = false; });
+
+            // Mouse & Touch Drag-to-Spin
+            const startDrag = (clientX) => {
+                state.orbitDragging = true;
+                state.orbitTargetAngle = null;
+                state.orbitDragStartX = clientX;
+                state.orbitDragStartAngle = state.orbitAngle;
+            };
+            const moveDrag = (clientX) => {
+                if (!state.orbitDragging) return;
+                const deltaX = clientX - state.orbitDragStartX;
+                state.orbitAngle = state.orbitDragStartAngle + deltaX * 0.35;
+            };
+            const endDrag = () => { state.orbitDragging = false; };
+
+            viewport.addEventListener('mousedown', (e) => startDrag(e.clientX));
+            window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+            window.addEventListener('mouseup', endDrag);
+
+            viewport.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), { passive: true });
+            viewport.addEventListener('touchmove', (e) => moveDrag(e.touches[0].clientX), { passive: true });
+            viewport.addEventListener('touchend', endDrag);
+
+            updateOrbitReadout(0);
+            animateOrbit();
+        }
+
+        function focusOrbitItem(idx) {
+            const step = 360 / orbitItems.length;
+            const desiredMod = (-idx * step) % 360;
+            const currentMod = state.orbitAngle % 360;
+            let diff = desiredMod - currentMod;
+            if (diff > 180) diff -= 360;
+            if (diff < -180) diff += 360;
+            state.orbitTargetAngle = state.orbitAngle + diff;
+        }
+
+        function stepOrbit(dir) {
+            const nextIdx = (state.activeOrbitIdx + dir + orbitItems.length) % orbitItems.length;
+            focusOrbitItem(nextIdx);
+        }
+
+        function toggleOrbitPause() {
+            state.orbitPaused = !state.orbitPaused;
+            document.getElementById('orbit-pause-label').textContent = state.orbitPaused ? 'Paused' : 'Auto-Orbiting';
+            document.getElementById('orbit-pause-icon').setAttribute('data-lucide', state.orbitPaused ? 'play' : 'pause');
+            lucide.createIcons();
+        }
+
+        function updateOrbitReadout(idx) {
+            const item = orbitItems[idx];
+            if (!item) return;
+            document.getElementById('orbit-active-cat').textContent = `${item.category} • ${item.origin}`;
+            document.getElementById('orbit-active-index').textContent = `0${idx + 1} / 05`;
+            document.getElementById('orbit-active-title').textContent = item.name;
+            document.getElementById('orbit-active-price').textContent = formatMoney(item);
+            document.getElementById('orbit-active-add').onclick = (e) => addToCart(item.id, e);
+        }
+
+        function animateOrbit() {
+            if (!state.orbitDragging) {
+                if (state.orbitTargetAngle !== null) {
+                    const delta = state.orbitTargetAngle - state.orbitAngle;
+                    state.orbitAngle += delta * 0.1;
+                    if (Math.abs(delta) < 0.25) {
+                        state.orbitAngle = state.orbitTargetAngle;
+                        state.orbitTargetAngle = null;
+                    }
+                } else if (!state.orbitPaused) {
+                    const speed = state.orbitHovering ? 0.08 : 0.28;
+                    state.orbitAngle -= speed;
+                }
+            }
+
+            const nodes = document.querySelectorAll('.orbital-node');
+            const total = nodes.length;
+            const radiusX = window.innerWidth < 640 ? 135 : 230;
+            const radiusZ = window.innerWidth < 640 ? 110 : 185;
+
+            let frontIdx = 0;
+            let maxCos = -2;
+
+            nodes.forEach((node, idx) => {
+                const deg = state.orbitAngle + idx * (360 / total);
+                const rad = (deg * Math.PI) / 180;
+                const sin = Math.sin(rad);
+                const cos = Math.cos(rad); // +1 is front, -1 is back
+
+                if (cos > maxCos) {
+                    maxCos = cos;
+                    frontIdx = idx;
+                }
+
+                const x = sin * radiusX;
+                const z = cos * radiusZ;
+                const scale = 0.64 + ((cos + 1) / 2) * 0.44;
+                const opacity = 0.35 + ((cos + 1) / 2) * 0.65;
+                const zIndex = Math.round((cos + 1) * 50);
+
+                node.style.transform = `translate3d(${x}px, ${-cos * 10}px, ${z}px) scale(${scale})`;
+                node.style.opacity = opacity;
+                node.style.zIndex = zIndex;
+                node.style.borderColor = cos > 0.85 ? 'rgba(229, 184, 105, 0.85)' : 'rgba(229, 184, 105, 0.22)';
+                node.style.boxShadow = cos > 0.85 ? '0 24px 48px rgba(0,0,0,0.85), 0 0 28px rgba(229,184,105,0.28)' : '0 10px 25px rgba(0,0,0,0.6)';
+            });
+
+            if (frontIdx !== state.activeOrbitIdx) {
+                state.activeOrbitIdx = frontIdx;
+                updateOrbitReadout(frontIdx);
+            }
+
+            requestAnimationFrame(animateOrbit);
+        }
+
+        /* =========================================================
+           4. SCROLL-VELOCITY-DRIVEN ARTISAN WORKSHOP CONVEYOR
+        ========================================================= */
+        function initWorkshopConveyor() {
+            const track = document.getElementById('conveyor-track');
+            const cardsHTML = workshopStations.map(st => `
+                <div class="w-72 sm:w-80 shrink-0 rounded-3xl bg-[#12100E] border border-[#E5B869]/25 hover:border-[#E06D53] p-5 flex items-center gap-4 shadow-xl transition-colors">
+                    <div class="w-28 h-24 rounded-2xl bg-[#070606] border border-white/5 flex items-center justify-center shrink-0">
+                        ${st.svg}
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#E06D53] block">${st.location}</span>
+                        <h4 class="font-serif text-xl font-bold text-[#F7F3EA] leading-snug mt-0.5">${st.title}</h4>
+                        <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-[#E5B869]/15 text-[#E5B869] text-[10px] font-semibold">
+                            ${st.temp}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Duplicate twice for seamless infinite loop
+            track.innerHTML = cardsHTML + cardsHTML + cardsHTML;
+
+            let offset = 0;
+            let lastScrollY = window.scrollY;
+            let scrollVelocity = 0;
+
+            window.addEventListener('scroll', () => {
+                const currentY = window.scrollY;
+                scrollVelocity = (currentY - lastScrollY) * 0.18;
+                lastScrollY = currentY;
+            }, { passive: true });
+
+            function stepConveyor() {
+                scrollVelocity *= 0.92; // Smooth decay
+                offset -= (0.65 + scrollVelocity);
+                const singleSetWidth = track.scrollWidth / 3;
+                if (Math.abs(offset) >= singleSetWidth) {
+                    offset = offset % singleSetWidth;
+                }
+                if (offset > 0) {
+                    offset -= singleSetWidth;
+                }
+                track.style.transform = `translate3d(${offset}px, 0, 0)`;
+                requestAnimationFrame(stepConveyor);
+            }
+            stepConveyor();
+        }
+
+        /* =========================================================
+           5. PRODUCT GALLERY, SLIDING PILL, 3D TILT & BEZIER PARTICLE
+        ========================================================= */
+
+
+        function positionSlidingPill(btnEl) {
+            const pill = document.getElementById('sliding-pill');
+
+            if (!pill || !btnEl) return;
+
+            pill.style.left = btnEl.offsetLeft + 'px';
+            pill.style.top = btnEl.offsetTop + 'px';
+            pill.style.width = btnEl.offsetWidth + 'px';
+            pill.style.height = btnEl.offsetHeight + 'px';
+            pill.style.bottom = 'auto';
+        }
+
+
+        function filterCategory(cat, btnEl = null) {
+            state.category = cat;
+            state.wishlistOnly = false;
+            updateWishlistBtn();
+
+            const targetBtn = btnEl || document.querySelector(`.cat-btn[data-cat="${cat}"]`);
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                const active = b.getAttribute('data-cat') === cat;
+                b.className = active
+                    ? "cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-extrabold text-[#070606] transition-colors shrink-0"
+                    : "cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0";
+            });
+            positionSlidingPill(targetBtn);
+            renderProducts();
+        }
+
+        function toggleCurrency() {
+            state.currency = state.currency === 'INR' ? 'USD' : 'INR';
+            document.getElementById('currency-label').textContent = state.currency === 'INR' ? '₹ INR' : '$ USD';
+            // Refresh orbital prices
+            document.querySelectorAll('.orbital-node').forEach((node, idx) => {
+                node.querySelector('span:last-child').textContent = formatMoney(orbitItems[idx]);
+            });
+            updateOrbitReadout(state.activeOrbitIdx);
+            renderProducts();
+            renderCart();
+            showToast(`Currency switched to ${state.currency}`);
+        }
+
+        async function toggleWishlist(productId, event) {
+            if (event) event.stopPropagation();
+            const idx = state.wishlist.indexOf(productId);
+            const item = products.find(p => p.id === productId);
+            const adding = idx === -1;
+            if (adding) state.wishlist.push(productId); else state.wishlist.splice(idx, 1);
+            document.getElementById('wishlist-count').textContent = state.wishlist.length;
+            renderProducts();
+            try {
+                const me = await fetch('api/auth/me').then(r => r.json());
+                if (me.authenticated && me.role === 'customer') {
+                    const url = adding ? 'api/wishlist' : `api/wishlist?productId=${productId}`;
+                    const response = await fetch(url, adding ? {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId})} : {method:'DELETE'});
+                    if (!response.ok) throw new Error('Wishlist could not be updated.');
+                } else if (adding) {
+                    showToast('Saved on this visit. Sign in as a customer to sync your wishlist.');
+                    return;
+                }
+            } catch (error) { console.warn(error); }
+            showToast(adding ? `Saved "${item?.name || 'item'}" to wishlist` : 'Removed from wishlist');
+        }
+
+        function toggleWishlistFilter() {
+            state.wishlistOnly = !state.wishlistOnly;
+            updateWishlistBtn();
+            renderProducts();
+            document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateWishlistBtn() {
+            const btn = document.getElementById('wishlist-btn');
+            btn.classList.toggle('border-[#E06D53]', state.wishlistOnly);
+            btn.classList.toggle('bg-[#E06D53]/20', state.wishlistOnly);
+        }
+
+        function handleSearch(val) {
+            state.searchQuery = val.trim().toLowerCase();
+            renderProducts();
+        }
+
+        function handleSort(val) {
+            state.sortBy = val;
+            renderProducts();
+        }
+
+        function handleAdvancedFilters() {
+            state.materialQuery = document.getElementById('material-filter').value.trim().toLowerCase();
+            state.minPrice = document.getElementById('min-price').value;
+            state.maxPrice = document.getElementById('max-price').value;
+            state.minRating = document.getElementById('rating-filter').value;
+            renderProducts();
+        }
+
+        function resetFilters() {
+            state.searchQuery = '';
+            state.sortBy = 'featured';
+            state.wishlistOnly = false;
+            document.getElementById('search-input').value = '';
+            document.getElementById('sort-select').value = 'featured';
+            document.getElementById('material-filter').value = '';
+            document.getElementById('min-price').value = '';
+            document.getElementById('max-price').value = '';
+            document.getElementById('rating-filter').value = '';
+            state.materialQuery = ''; state.minPrice = ''; state.maxPrice = ''; state.minRating = '';
+            filterCategory('All');
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            const empty = document.getElementById('empty-state');
+            const countEl = document.getElementById('product-count');
+
+            let list = products.filter(p => {
+                const matchCat = state.category === 'All' || p.category === state.category;
+                const matchWish = !state.wishlistOnly || state.wishlist.includes(p.id);
+                const matchSearch = !state.searchQuery ||
+                    p.name.toLowerCase().includes(state.searchQuery) ||
+                    String(p.origin || '').toLowerCase().includes(state.searchQuery) ||
+                    String(p.category || '').toLowerCase().includes(state.searchQuery) ||
+                    String(p.artisan || '').toLowerCase().includes(state.searchQuery) ||
+                    String(p.sellerLocation || '').toLowerCase().includes(state.searchQuery) ||
+                    String(p.material || '').toLowerCase().includes(state.searchQuery);
+                const matchMaterial = !state.materialQuery || String(p.material || '').toLowerCase().includes(state.materialQuery);
+                const price = Number(p.priceINR || 0);
+                const matchMin = !state.minPrice || price >= Number(state.minPrice);
+                const matchMax = !state.maxPrice || price <= Number(state.maxPrice);
+                const matchRating = !state.minRating || Number(p.ratingAverage || 0) >= Number(state.minRating);
+                return matchCat && matchWish && matchSearch && matchMaterial && matchMin && matchMax && matchRating;
+            });
+
+            if (state.sortBy === 'price-asc') list.sort((a, b) => getUnitVal(a) - getUnitVal(b));
+            if (state.sortBy === 'price-desc') list.sort((a, b) => getUnitVal(b) - getUnitVal(a));
+            if (state.sortBy === 'rating') list.sort((a, b) => Number(b.ratingAverage || 0) - Number(a.ratingAverage || 0));
+
+            countEl.textContent = `Showing ${list.length} ${list.length === 1 ? 'piece' : 'pieces'}`;
+
+            if (list.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+            empty.classList.add('hidden');
+
+            grid.innerHTML = list.map(product => {
+                const saved = state.wishlist.includes(product.id);
+                const visual = product.imageUrl ? `<img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-cover rounded-2xl" loading="lazy">` : (product.svg || '<div class="text-[#E5B869] text-5xl">✦</div>');
+                return `
+                <div class="levitate-wrap">
+                    <article class="tilt-card group h-full bg-[#12100E] rounded-3xl border border-[#E5B869]/20 flex flex-col justify-between">
+                        <div>
+                            <div onclick="openQuickView(${product.id})" class="relative h-60 bg-gradient-to-b from-[#1C1713] to-[#0E0C0A] p-6 flex items-center justify-center cursor-pointer overflow-hidden">
+                                <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
+                                    <span class="px-3 py-1 rounded-full bg-[#070606]/85 border border-[#E5B869]/30 text-[#E5B869] text-[10px] font-bold uppercase tracking-wider">
+                                        ${product.badge}
+                                    </span>
+                                    <div class="flex items-center gap-1.5">
+                                        <button onclick="toggleWishlist(${product.id}, event)" class="w-8 h-8 rounded-full bg-[#070606]/85 border border-white/10 hover:border-[#E06D53] flex items-center justify-center transition-colors">
+                                            <i data-lucide="heart" class="w-3.5 h-3.5 ${saved ? 'fill-[#E06D53] text-[#E06D53]' : 'text-[#F7F3EA]'}"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); openQuickView(${product.id})" class="w-8 h-8 rounded-full bg-[#070606]/85 border border-white/10 hover:border-[#E5B869] flex items-center justify-center text-[#F7F3EA] transition-colors" title="360° Inspect">
+                                            <i data-lucide="rotate-3d" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                ${visual}
+                            </div>
+
+                            <div class="p-5 pb-3">
+                                <div class="flex items-center gap-1.5 text-[11px] text-[#A69D90] mb-1">
+                                    <i data-lucide="map-pin" class="w-3 h-3 text-[#E06D53]"></i>
+                                    <span>${product.origin || product.sellerLocation || 'India'}</span>
+                                    <span>•</span>
+                                    <span class="text-[#E5B869] font-semibold">${product.category}</span>
+                                </div>
+                                <h3 onclick="openQuickView(${product.id})" class="font-serif text-2xl font-bold text-[#F7F3EA] group-hover:text-[#E5B869] transition-colors cursor-pointer">
+                                    ${product.name}
+                                </h3>
+                                <p class="text-xs text-[#A69D90] mt-1.5 line-clamp-2 leading-relaxed">${product.description || ''}</p>
+                                ${Number(product.ratingCount || 0) > 0 ? `<p class="text-[11px] text-[#E5B869] mt-2">★ ${Number(product.ratingAverage || 0).toFixed(1)} <span class="text-[#A69D90]">(${product.ratingCount} reviews)</span></p>` : ''}
+                                ${product.shopName ? `<p class="text-[10px] text-[#A69D90] mt-1">By ${product.shopName} · ${product.sellerLocation || ''}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="px-5 pb-5 pt-3 flex items-center justify-between border-t border-white/5 mt-2">
+                            <div>
+                                <span class="text-[10px] uppercase tracking-wider text-[#7C7367] block">Price</span>
+                                <span class="text-lg font-extrabold text-[#F7F3EA]">${formatMoney(product)}</span>
+                            </div>
+                            <button onclick="addToCart(${product.id}, event)" class="px-4 py-2.5 rounded-full bg-[#1E1A16] hover:bg-gradient-to-r hover:from-[#E5B869] hover:to-[#E06D53] text-[#F7F3EA] hover:text-[#070606] border border-[#E5B869]/35 text-xs font-extrabold flex items-center gap-1.5 transition-all active:scale-95">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                Add to Bag
+                            </button>
+                        </div>
+                    </article>
+                </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+            attachTiltPhysics();
+        }
+
+        function attachTiltPhysics() {
+            document.querySelectorAll('.tilt-card').forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mx', `${x}px`);
+                    card.style.setProperty('--my', `${y}px`);
+                    const rx = ((y - rect.height / 2) / (rect.height / 2)) * -6;
+                    const ry = ((x - rect.width / 2) / (rect.width / 2)) * 6;
+                    card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
+                });
+            });
+        }
+
+        // Curved Bezier Flying Golden Ember Trail + Shockwave Ring on Cart Icon
+        function launchBezierEmber(event) {
+            const cartBtn = document.getElementById('nav-cart-btn');
+            if (!cartBtn) return;
+
+            const startX = event?.clientX || window.innerWidth / 2;
+            const startY = event?.clientY || window.innerHeight / 2;
+            const endRect = cartBtn.getBoundingClientRect();
+            const endX = endRect.left + endRect.width / 2;
+            const endY = endRect.top + endRect.height / 2;
+
+            // Control point for high sweeping arc
+            const ctrlX = (startX + endX) / 2 - 90;
+            const ctrlY = Math.min(startY, endY) - 140;
+
+            const orb = document.createElement('div');
+            orb.style.cssText = `
+                position: fixed; left: 0; top: 0; width: 14px; height: 14px;
+                border-radius: 9999px; pointer-events: none; z-index: 9999;
+                background: radial-gradient(circle, #FCE3B4 0%, #E06D53 100%);
+                box-shadow: 0 0 18px #E5B869, 0 0 30px #E06D53;
+            `;
+            document.body.appendChild(orb);
+
+            const duration = 620;
+            const startTime = performance.now();
+
+            function step(now) {
+                const t = Math.min(1, (now - startTime) / duration);
+                const inv = 1 - t;
+                const x = inv * inv * startX + 2 * inv * t * ctrlX + t * t * endX;
+                const y = inv * inv * startY + 2 * inv * t * ctrlY + t * t * endY;
+                const scale = 1 - t * 0.55;
+
+                orb.style.transform = `translate3d(${x - 7}px, ${y - 7}px, 0) scale(${scale})`;
+
+                // Leave tiny fading spark trail
+                if (Math.random() > 0.35) {
+                    const trail = document.createElement('div');
+                    trail.style.cssText = `
+                        position: fixed; left: ${x - 3}px; top: ${y - 3}px; width: 6px; height: 6px;
+                        border-radius: 9999px; background: #E5B869; pointer-events: none; z-index: 9998;
+                        opacity: 0.8; transition: opacity 0.35s, transform 0.35s;
+                    `;
+                    document.body.appendChild(trail);
+                    requestAnimationFrame(() => {
+                        trail.style.opacity = '0';
+                        trail.style.transform = 'scale(0.1)';
+                    });
+                    setTimeout(() => trail.remove(), 350);
+                }
+
+                if (t < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    orb.remove();
+                    triggerCartShockwave();
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function triggerCartShockwave() {
+            const anchor = document.getElementById('cart-shockwave-anchor');
+            if (!anchor) return;
+            const ring = document.createElement('span');
+            ring.className = 'shockwave-ring';
+            anchor.appendChild(ring);
+            setTimeout(() => ring.remove(), 750);
+        }
+
+        /* =========================================================
+           6. INTERACTIVE CRAFTSMANSHIP STORY TABS & LINE-ART DRAWING
+        ========================================================= */
+        function selectStoryStep(idx) {
+            const data = storySteps[idx];
+            if (!data) return;
+
+            for (let i = 0; i < 3; i++) {
+                const tab = document.getElementById(`story-tab-${i}`);
+                const bar = document.getElementById(`story-bar-${i}`);
+                if (i === idx) {
+                    tab.className = "story-tab text-left p-5 rounded-2xl bg-[#1A1613] border border-[#E5B869] transition-all relative overflow-hidden";
+                    bar.style.width = "100%";
+                } else {
+                    tab.className = "story-tab text-left p-5 rounded-2xl bg-[#161311] border border-white/10 hover:border-[#E5B869]/40 transition-all relative overflow-hidden";
+                    bar.style.width = "0%";
+                }
+            }
+
+            const svgStage = document.getElementById('story-svg-stage');
+            svgStage.classList.remove('draw-active');
+            svgStage.innerHTML = data.svg;
+            void svgStage.offsetWidth;
+            svgStage.classList.add('draw-active');
+
+            document.getElementById('story-badge').textContent = data.badge;
+            document.getElementById('story-heading').textContent = data.heading;
+            document.getElementById('story-body').textContent = data.body;
+
+            data.stats.forEach((st, sIdx) => {
+                document.getElementById(`story-stat-${sIdx + 1}-val`).textContent = st.val;
+                document.getElementById(`story-stat-${sIdx + 1}-lbl`).textContent = st.lbl;
+            });
+        }
+
+        /* =========================================================
+           7. 360° QUICK-VIEW MODAL, CART DRAWER & CHECKOUT CELEBRATION
+        ========================================================= */
+        let qvAngle = 0;
+        let qvDragging = false;
+        let qvStartX = 0;
+
+        function openQuickView(id) {
+            const item = products.find(p => p.id === id);
+            if (!item) return;
+
+            qvAngle = 0;
+            const visual = document.getElementById('qv-visual');
+            window.qvImages = Array.isArray(item.images) && item.images.length ? item.images : (item.imageUrl ? [item.imageUrl] : []);
+            window.qvImageIndex = 0;
+            renderQuickViewImages(item);
+            visual.style.transform = `perspective(700px) rotateY(0deg)`;
+            document.getElementById('qv-angle-readout').textContent = '0°';
+
+            document.getElementById('qv-origin').textContent = `${item.origin} • ${item.category}`;
+            document.getElementById('qv-title').textContent = item.name;
+            document.getElementById('qv-price').textContent = formatMoney(item);
+            document.getElementById('qv-desc').textContent = item.description;
+            document.getElementById('qv-artisan').querySelector('span').textContent = item.artisan;
+            document.getElementById('qv-dimensions').querySelector('span').textContent = item.dimensions;
+            loadQuickViewReviews(item.id);
+
+            document.getElementById('qv-add-btn').dataset.productId = item.id;
+            document.getElementById('qv-add-btn').onclick = (e) => {
+                addToCart(item.id, e);
+                closeQuickView();
+            };
+
+            const modal = document.getElementById('quick-view-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        async function loadQuickViewReviews(productId) {
+            const panel = document.getElementById('qv-reviews');
+            panel.textContent = 'Loading customer reviews…';
+            try {
+                const response = await fetch(`api/reviews?productId=${productId}`);
+                const rows = await response.json();
+                panel.innerHTML = rows.length ? `<strong class="text-[#E5B869]">Customer reviews</strong>` + rows.slice(0,3).map(r => `<div class="mt-2"><span class="text-[#E5B869]">${'★'.repeat(Number(r.rating))}${'☆'.repeat(5-Number(r.rating))}</span> <span>${r.customerName}</span><p>${r.review}</p></div>`).join('') : 'No customer reviews yet. Sign in to share your experience.';
+            } catch (error) { panel.textContent = 'Reviews are temporarily unavailable.'; }
+        }
+
+        function renderQuickViewImages(item) {
+            const visual = document.getElementById('qv-visual');
+            if (window.qvImages && window.qvImages.length) {
+                const src = window.qvImages[window.qvImageIndex || 0];
+                visual.innerHTML = `<img src="${src}" alt="${item.name}" class="max-w-full max-h-48 rounded-xl object-contain mx-auto">` + (window.qvImages.length > 1 ? `<div class="flex gap-2 justify-center mt-3">${window.qvImages.map((img,i)=>`<button onclick="qvSelectImage(${i})" class="w-10 h-10 rounded-lg overflow-hidden border ${i===window.qvImageIndex?'border-[#E5B869]':'border-white/20'}"><img src="${img}" class="w-full h-full object-cover"></button>`).join('')}</div>` : '');
+            } else visual.innerHTML = `<div class="scale-125">${item.svg || ''}</div>`;
+        }
+        function qvSelectImage(index) {
+            const item = products.find(p => p.id === Number(document.getElementById('qv-add-btn').dataset.productId));
+            if (!item) return;
+            window.qvImageIndex = index;
+            renderQuickViewImages(item);
+        }
+
+        function closeQuickView() {
+            const modal = document.getElementById('quick-view-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function initQuickView360() {
+            const stage = document.getElementById('qv-360-stage');
+            const visual = document.getElementById('qv-visual');
+            const readout = document.getElementById('qv-angle-readout');
+
+            const onDown = (x) => { qvDragging = true; qvStartX = x; };
+            const onMove = (x) => {
+                if (!qvDragging) return;
+                const dx = x - qvStartX;
+                qvStartX = x;
+                qvAngle = (qvAngle + dx * 1.2) % 360;
+                visual.style.transform = `perspective(700px) rotateY(${qvAngle}deg)`;
+                readout.textContent = `${Math.round((qvAngle + 360) % 360)}°`;
+            };
+            const onUp = () => { qvDragging = false; };
+
+            stage.addEventListener('mousedown', e => onDown(e.clientX));
+            window.addEventListener('mousemove', e => onMove(e.clientX));
+            window.addEventListener('mouseup', onUp);
+
+            stage.addEventListener('touchstart', e => onDown(e.touches[0].clientX), { passive: true });
+            stage.addEventListener('touchmove', e => onMove(e.touches[0].clientX), { passive: true });
+            stage.addEventListener('touchend', onUp);
+        }
+
+        function toggleCart(open) {
+            const drawer = document.getElementById('cart-drawer');
+            const backdrop = document.getElementById('cart-backdrop');
+            if (open) {
+                backdrop.classList.remove('hidden');
+                drawer.classList.remove('translate-x-full');
+            } else {
+                backdrop.classList.add('hidden');
+                drawer.classList.add('translate-x-full');
+            }
+        }
+
+        function addToCart(productId, event) {
+            fetch('api/cart', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({productId: productId, quantity: 1}) }).catch(console.error);
+            const found = state.cart.find(c => c.id === productId);
+            if (found) found.qty += 1;
+            else state.cart.push({ id: productId, qty: 1 });
+
+            const item = products.find(p => p.id === productId);
+            launchBezierEmber(event);
+            renderCart();
+            showToast(`Added "${item.name}" to bag`);
+        }
+
+        function updateCartQty(id, delta) {
+            const idx = state.cart.findIndex(c => c.id === id);
+            if (idx === -1) return;
+            state.cart[idx].qty += delta;
+            if (state.cart[idx].qty <= 0) state.cart.splice(idx, 1);
+            const current = state.cart.find(c => c.id === id);
+            fetch('api/cart', { method: current ? 'PUT' : 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({productId: id, quantity: current ? current.qty : 0}) }).catch(console.error);
+            renderCart();
+        }
+
+        function removeCartItem(id) {
+            state.cart = state.cart.filter(c => c.id !== id);
+            fetch('api/cart', { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({productId: id}) }).catch(console.error);
+            renderCart();
+        }
+
+        function renderCart() {
+            const listEl = document.getElementById('cart-items');
+            const countBadge = document.getElementById('cart-count');
+            const drawerBadge = document.getElementById('drawer-badge');
+            const subEl = document.getElementById('cart-subtotal');
+            const totEl = document.getElementById('cart-total');
+            const footer = document.getElementById('cart-footer');
+
+            const totalQty = state.cart.reduce((acc, c) => acc + c.qty, 0);
+            countBadge.textContent = totalQty;
+            drawerBadge.textContent = `${totalQty} ${totalQty === 1 ? 'item' : 'items'}`;
+
+            if (state.cart.length === 0) {
+                footer.classList.add('hidden');
+                listEl.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center py-12">
+                        <i data-lucide="shopping-bag" class="w-10 h-10 text-[#E5B869] mb-3"></i>
+                        <h4 class="font-display text-lg font-bold text-[#F7F3EA]">Your Bag is Empty</h4>
+                        <p class="text-xs text-[#A69D90] mt-1 mb-5">Spin the 3D orbital showcase or browse our gallery to add heirlooms.</p>
+                        <button onclick="toggleCart(false)" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#E5B869] to-[#E06D53] text-[#070606] text-xs font-extrabold uppercase">Explore Collection</button>
+                    </div>
+                `;
+                updateShippingProgress(0);
+                lucide.createIcons();
+                return;
+            }
+
+            footer.classList.remove('hidden');
+            let subtotal = 0;
+
+            listEl.innerHTML = state.cart.map(c => {
+                const p = products.find(prod => prod.id === c.id);
+                const unit = getUnitVal(p);
+                subtotal += unit * c.qty;
+
+                return `
+                    <div class="flex gap-3.5 p-3.5 rounded-2xl bg-[#161311] border border-[#E5B869]/20">
+                        <div class="w-16 h-16 rounded-xl bg-[#070606] flex items-center justify-center shrink-0 overflow-hidden">
+                            <div class="scale-[0.42]">${p.svg}</div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <h4 class="font-serif text-lg font-bold text-[#F7F3EA] truncate">${p.name}</h4>
+                                <button onclick="removeCartItem(${p.id})" class="text-[#7C7367] hover:text-[#E06D53]"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                            <p class="text-[11px] text-[#A69D90]">${p.origin}</p>
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="inline-flex items-center rounded-full bg-[#070606] border border-[#E5B869]/30">
+                                    <button onclick="updateCartQty(${p.id}, -1)" class="w-6 h-6 text-xs font-bold text-[#E5B869]">−</button>
+                                    <span class="px-2 text-xs font-bold">${c.qty}</span>
+                                    <button onclick="updateCartQty(${p.id}, 1)" class="w-6 h-6 text-xs font-bold text-[#E5B869]">+</button>
+                                </div>
+                                <span class="text-sm font-extrabold text-[#E5B869]">${formatMoney(unit * c.qty, true)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            subEl.textContent = formatMoney(subtotal, true);
+            totEl.textContent = formatMoney(subtotal, true);
+            updateShippingProgress(subtotal);
+            lucide.createIcons();
+        }
+
+        function updateShippingProgress(subtotal) {
+            const limit = state.currency === 'INR' ? FREE_SHIP_INR : FREE_SHIP_USD;
+            const pct = Math.min(100, Math.round((subtotal / limit) * 100));
+            document.getElementById('shipping-progress').style.width = `${pct}%`;
+            const txt = document.getElementById('shipping-text');
+            if (subtotal >= limit) {
+                txt.innerHTML = `<span class="text-[#E5B869] font-bold">Free Insured Crate Shipping Unlocked!</span>`;
+            } else {
+                txt.innerHTML = `Add <strong class="text-[#E5B869]">${formatMoney(limit - subtotal, true)}</strong> more for free insured shipping`;
+            }
+        }
+
+        async function triggerCheckoutCelebration() {
+            if (!state.cart.length) { showToast('Your bag is empty.'); return; }
+            window.location.href = 'checkout.html';
+            return;
+            /* Legacy direct-checkout code retained below for reference; checkout now uses the address/payment page.
+            try {
+                const response = await fetch('api/orders', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({items: state.cart.map(item => ({productId:item.id, quantity:item.qty}))})
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Could not place order');
+                document.querySelector('#checkout-modal strong').textContent = '#' + result.orderNumber;
+                toggleCart(false);
+                const modal = document.getElementById('checkout-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                state.cart = [];
+                fetch('api/cart', {method:'DELETE'}).catch(console.error);
+                renderCart();
+                lucide.createIcons();
+                launchGoldConfetti();
+            } catch (error) {
+                showToast(error.message || 'Checkout failed. Please try again.');
+            }
+            */
+        }
+
+        function closeCheckout() {
+            const modal = document.getElementById('checkout-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function launchGoldConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const colors = ['#E5B869', '#E06D53', '#FCE3B4', '#B8864B'];
+            const pieces = Array.from({ length: 95 }, () => ({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 16,
+                vy: (Math.random() - 0.75) * 16,
+                size: Math.random() * 7 + 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rot: Math.random() * Math.PI * 2,
+                vRot: (Math.random() - 0.5) * 0.25
+            }));
+
+            let frame = 0;
+            function renderConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pieces.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.32;
+                    p.rot += p.vRot;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                    ctx.restore();
+                });
+                frame++;
+                if (frame < 130) requestAnimationFrame(renderConfetti);
+                else ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            renderConfetti();
+        }
+
+        let toastTimer;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.remove('opacity-0', 'translate-y-4');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.add('opacity-0', 'translate-y-4'), 2500);
+        }
+
+        // Background Ambient Rising Embers Canvas
+        function initAmbientSparks() {
+            const canvas = document.getElementById('sparks-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h, sparks;
+
+            const setup = () => {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+                sparks = Array.from({ length: 42 }, () => ({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    r: Math.random() * 2 + 0.6,
+                    vx: (Math.random() - 0.5) * 0.35,
+                    vy: -(Math.random() * 0.45 + 0.15),
+                    alpha: Math.random() * 0.6 + 0.15,
+                    ember: Math.random() > 0.6
+                }));
+            };
+
+            const draw = () => {
+                ctx.clearRect(0, 0, w, h);
+                sparks.forEach(s => {
+                    s.x += s.vx;
+                    s.y += s.vy;
+                    if (s.y < -10) { s.y = h + 10; s.x = Math.random() * w; }
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = s.ember ? `rgba(224,109,83,${s.alpha})` : `rgba(229,184,105,${s.alpha})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            };
+
+            setup();
+            draw();
+            window.addEventListener('resize', setup);
+        }
+
+
+        async function loadMarketplaceCategories() {
+            try {
+                const response = await fetch('api/categories');
+                if (!response.ok) return;
+                const categories = await response.json();
+                const bar = document.getElementById('filter-bar');
+                const existing = new Set(Array.from(bar.querySelectorAll('.cat-btn')).map(b => b.dataset.cat));
+                categories.forEach(category => {
+                    if (existing.has(category.name)) return;
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'cat-btn relative z-10 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#A69D90] hover:text-[#F7F3EA] transition-colors shrink-0';
+                    button.dataset.cat = category.name;
+                    button.textContent = category.name;
+                    button.addEventListener('click', () => filterCategory(category.name, button));
+                    bar.appendChild(button);
+                });
+            } catch (error) {
+                console.warn('Could not load marketplace categories.', error);
+            }
+        }
+
+        // Scroll Reveal Observer
+        function initScrollReveal() {
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) e.target.classList.add('visible');
+                });
+            }, { threshold: 0.12 });
+            document.querySelectorAll('.reveal-up').forEach(el => obs.observe(el));
+        }
+
+
+        // Java backend connection: load catalogue and restore this browser session's cart.
+        async function connectJavaBackend() {
+            try {
+                const productResponse = await fetch('api/products');
+                if (productResponse.ok) {
+                    const serverProducts = await productResponse.json();
+                    const originalArtwork = products;
+                    products = serverProducts.map(serverProduct => {
+                        const original = originalArtwork.find(p => p.id === serverProduct.id) || {};
+                        return {...original, ...serverProduct, svg: original.svg || ''};
+                    });
+                    const suggestions = document.getElementById('search-suggestions');
+                    if (suggestions) {
+                        const values = new Set();
+                        products.forEach(p => [p.name, p.category, p.material, p.origin, p.artisan, p.shopName].forEach(v => { if (v) values.add(String(v)); }));
+                        suggestions.replaceChildren(...Array.from(values).map(value => { const option = document.createElement('option'); option.value = value; return option; }));
+                    }
+                }
+                const cartResponse = await fetch('api/cart');
+                if (cartResponse.ok) {
+                    const savedCart = await cartResponse.json();
+                    state.cart = Array.isArray(savedCart.items) ? savedCart.items : [];
+                }
+                const me = await fetch('api/auth/me').then(r => r.json());
+                if (me.authenticated && me.role === 'customer') {
+                    const saved = await fetch('api/wishlist').then(r => r.ok ? r.json() : []);
+                    state.wishlist = Array.isArray(saved) ? saved.map(x => Number(x.id)) : [];
+                    const wishCount = document.getElementById('wishlist-count');
+                    if (wishCount) wishCount.textContent = state.wishlist.length;
+                }
+            } catch (error) {
+                console.warn('Java backend is not reachable yet. Showing the local catalogue.', error);
+            }
+        }
+
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await connectJavaBackend();
+            await loadMarketplaceCategories();
+            initMagneticCursor();
+            initAmbientSparks();
+            initOrbitalCarousel();
+            initWorkshopConveyor();
+            renderProducts();
+            renderCart();
+            selectStoryStep(0);
+            initQuickView360();
+            initScrollReveal();
+            lucide.createIcons();
+
+            // Initialize sliding category indicator pill position
+            setTimeout(() => {
+                positionSlidingPill(document.querySelector('.cat-btn[data-cat="All"]'));
+            }, 60);
+            window.addEventListener('resize', () => {
+                positionSlidingPill(document.querySelector(`.cat-btn[data-cat="${state.category}"]`));
+            });
+        });
+    </script>
+    <script src="chat-widget.js"></script>
+</body>
+</html>

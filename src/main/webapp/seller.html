@@ -1,0 +1,735 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Seller Studio | Handcraft Shop</title>
+    <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+
+<div class="wrap">
+
+    <!-- HEADER -->
+    <header class="top">
+        <a class="brand" href="index.html">HANDCRAFT SHOP</a>
+
+        <nav class="links">
+            <a href="index.html">Storefront</a>
+            <a href="register.html">Seller registration</a>
+            <a href="login.html">Sign in</a>
+            <button class="btn secondary" onclick="logout()">Sign out</button>
+        </nav>
+    </header>
+
+    <!-- SELLER INTRODUCTION -->
+    <section class="hero">
+        <span class="eyebrow">Independent artisan workspace</span>
+        <h1>Seller studio.</h1>
+        <p class="muted">
+            Manage your shop, product photos, inventory and your own customer orders.
+        </p>
+        <div id="sellerStatus" class="status">
+            Checking seller account…
+        </div>
+    </section>
+
+    <!-- DASHBOARD METRICS -->
+    <div class="grid" id="metrics"></div>
+
+    <!-- SHOP PROFILE -->
+    <section class="card" style="margin:18px 0">
+
+        <h2>Shop profile</h2>
+
+        <form id="shopProfile">
+
+            <div class="fieldrow">
+                <div>
+                    <label>Shop name</label>
+                    <input name="shopName" required>
+                </div>
+
+                <div>
+                    <label>Owner name</label>
+                    <input name="ownerName" required>
+                </div>
+
+                <div>
+                    <label>Phone</label>
+                    <input name="phone">
+                </div>
+            </div>
+
+            <div class="fieldrow">
+                <div>
+                    <label>Seller location</label>
+                    <input name="sellerLocation" required>
+                </div>
+
+                <div>
+                    <label>Craft speciality</label>
+                    <input name="craftSpeciality">
+                </div>
+            </div>
+
+            <label>Shop description</label>
+            <textarea name="shopDescription"></textarea>
+
+            <button class="btn secondary" type="submit">
+                Save shop profile
+            </button>
+
+        </form>
+
+        <div id="shopProfileMsg" class="small"></div>
+
+    </section>
+
+    <!-- ADD SINGLE PRODUCT -->
+    <section class="card" style="margin:18px 0">
+
+        <h2>Add a handmade product</h2>
+
+        <p class="small">
+    Upload a ZIP containing products.csv.
+    Each product uses 1–4 direct HTTPS image URLs
+    in the imageUrl column. No images folder is needed.
+</p>
+
+        <form id="productForm" enctype="multipart/form-data">
+
+            <div class="fieldrow">
+
+                <div>
+                    <label>Product name</label>
+                    <input name="name" required>
+                </div>
+
+                <div>
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option>Ceramics</option>
+                        <option>Textiles</option>
+                        <option>Woodwork</option>
+                        <option>Brass & Copper</option>
+                        <option>Silver</option>
+                        <option>Resin Art</option>
+                        <option>Crochet & Macrame</option>
+                        <option>Bags & Purses</option>
+                        <option>Fashion Accessories</option>
+                        <option>Home Decor</option>
+                        <option>Jewellery</option>
+                        <option>Paper Crafts</option>
+                        <option>Paintings</option>
+                        <option>Leatherwork</option>
+                        <option>Other Handmade Crafts</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Material</label>
+                    <input name="material"
+                           placeholder="e.g. rosewood, cotton, silver">
+                </div>
+
+            </div>
+
+            <div class="fieldrow">
+
+                <div>
+                    <label>Price (INR)</label>
+                    <input name="priceINR"
+                           type="number" min="1"
+                           step="0.01" required>
+                </div>
+
+                <div>
+                    <label>Available stock</label>
+                    <input name="stockQuantity"
+                           type="number" min="0"
+                           value="1" required>
+                </div>
+
+                <div>
+                    <label>Product origin</label>
+                    <input name="origin" placeholder="City, State">
+                </div>
+
+            </div>
+
+            <div class="fieldrow">
+
+                <div>
+                    <label>Artisan / maker name</label>
+                    <input name="artisan">
+                </div>
+
+                <div>
+                    <label>Dimensions</label>
+                    <input name="dimensions">
+                </div>
+
+                <div>
+                    <label>Craft badge</label>
+                    <input name="badge"
+                           placeholder="Handwoven / Hand-carved">
+                </div>
+
+            </div>
+
+            <label>Description</label>
+            <textarea name="description" required></textarea>
+
+            <label>Product photographs</label>
+            <input
+                type="file"
+                name="images"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                required
+            >
+
+            <button class="btn" type="submit">
+                Publish product
+            </button>
+
+        </form>
+
+        <div id="productMsg" class="status hidden"></div>
+
+    </section>
+
+    <!-- BULK PRODUCT UPLOAD -->
+    <section class="card" style="margin:18px 0">
+
+        <span class="eyebrow">Catalogue management</span>
+
+        <h2>Bulk upload multiple products</h2>
+
+        <p class="muted">
+            Add multiple handmade products across your marketplace categories
+            using a single ZIP file.
+        </p>
+
+        <div class="item">
+
+            <h3>Upload product catalogue</h3>
+
+            <p class="small">
+                Your ZIP file must contain:
+            </p>
+
+            <ul>
+                <li>products.csv – product information</li>
+                <li>images/ – product photographs</li>
+                <li>1–4 photographs for each product</li>
+            </ul>
+
+            <p class="small">
+                Maximum 200 products per upload.
+                JPG, PNG and WebP images are supported.
+            </p>
+
+            <p>
+                <a href="templates/Handcraft_Bulk_Upload_Template.zip" download>
+                    Download the product upload template
+                </a>
+            </p>
+
+            <form id="bulkUploadForm" enctype="multipart/form-data">
+
+                <label>Select your product ZIP file</label>
+
+                <input
+                    type="file"
+                    name="bulkZip"
+                    accept=".zip,application/zip"
+                    required
+                >
+
+                <button
+                    class="btn"
+                    type="submit"
+                    id="bulkUploadButton"
+                >
+                    Upload products and photographs
+                </button>
+
+            </form>
+
+            <div
+                id="bulkUploadMsg"
+                class="status hidden"
+                aria-live="polite">
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- YOUR PRODUCTS AND ORDERS -->
+    <section class="grid">
+
+        <section class="card">
+            <h2>Your products</h2>
+            <div id="productsList">Loading…</div>
+        </section>
+
+        <section class="card">
+            <h2>Seller orders</h2>
+            <div id="sellerOrders">Loading…</div>
+        </section>
+
+    </section>
+
+</div>
+
+<script>
+
+// HTML escaping
+function esc(value) {
+    return String(value ?? '').replace(/[&<>"']/g, function(char) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char];
+    });
+}
+
+// API helper
+async function api(url, options) {
+
+    const response = await fetch(url, options);
+    const text = await response.text();
+
+    let data = {};
+
+    try {
+        data = text ? JSON.parse(text) : {};
+    } catch (error) {
+        throw new Error("Invalid server response. Please check the server.");
+    }
+
+    if (!response.ok) {
+        throw new Error(data.error || data.message || "Request failed");
+    }
+
+    return data;
+}
+
+// LOAD SELLER DASHBOARD
+async function load() {
+
+    const me = await api('api/auth/me');
+
+    if (!me.authenticated || me.role !== 'seller') {
+        location.href = 'login.html';
+        return;
+    }
+
+    const d = await api('api/seller/dashboard');
+
+    document.getElementById('sellerStatus').textContent =
+        'Shop: ' + d.shopName +
+        ' · Location: ' + (d.location || 'Not set') +
+        ' · Approval: ' + d.approvalStatus;
+
+    if (d.approvalStatus !== 'APPROVED') {
+        document.getElementById('sellerStatus').textContent +=
+            ' — Your account must be approved before products can be published.';
+    }
+
+    document.getElementById('metrics').innerHTML = [
+        ['Active products', d.productCount],
+        ['Open orders', d.pendingOrders],
+        ['All seller orders', d.totalOrders],
+        ['Seller sales', '₹' + Number(d.sales || 0).toLocaleString('en-IN')]
+    ].map(item => `
+        <div class="card">
+            <div class="small">${item[0]}</div>
+            <div class="metric">${item[1] ?? 0}</div>
+        </div>
+    `).join('');
+
+    await Promise.all([
+        loadProfile(),
+        loadCategories(),
+        loadProducts(),
+        loadOrders()
+    ]);
+}
+
+// LOAD PROFILE
+async function loadProfile() {
+
+    const p = await api('api/seller/profile');
+    const f = document.getElementById('shopProfile');
+
+    const fields = {
+        shopName: 'shop_name',
+        ownerName: 'owner_name',
+        phone: 'phone',
+        sellerLocation: 'seller_location',
+        craftSpeciality: 'craft_speciality',
+        shopDescription: 'shop_description'
+    };
+
+    for (const key of Object.keys(fields)) {
+        f.elements[key].value = p[fields[key]] || '';
+    }
+}
+
+// SAVE PROFILE
+document.getElementById('shopProfile')
+.addEventListener('submit', async function(event) {
+
+    event.preventDefault();
+
+    const message = document.getElementById('shopProfileMsg');
+
+    try {
+
+        const data = Object.fromEntries(
+            new FormData(event.target)
+        );
+
+        const result = await api('api/seller/profile', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        message.textContent = result.message;
+
+        await load();
+
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
+
+// LOAD CATEGORIES
+async function loadCategories() {
+
+    try {
+
+        const categories = await api('api/categories');
+
+        const select = document.querySelector(
+            '#productForm select[name="category"]'
+        );
+
+        select.innerHTML = categories.map(category => `
+            <option value="${esc(category.name)}">
+                ${esc(category.name)}
+            </option>
+        `).join('');
+
+    } catch (error) {
+        console.warn('Could not load categories:', error);
+    }
+}
+
+// LOAD PRODUCTS
+async function loadProducts() {
+
+    const products = await api('api/seller/products');
+
+    document.getElementById('productsList').innerHTML =
+        products.length ? products.map(p => `
+            <div class="item">
+
+                <div class="fieldrow">
+
+                    <div>
+                        <strong>${esc(p.name)}</strong>
+
+                        <div class="small">
+                            ${esc(p.category)} · ${esc(p.origin)}
+                        </div>
+
+                        <div>
+                            ₹${p.price_inr} · Stock: ${p.stock_quantity}
+                            · ${p.active ? 'Active' : 'Hidden'}
+                        </div>
+                    </div>
+
+                    ${p.image_url
+                        ? `<img class="photo" src="${esc(p.image_url)}">`
+                        : ''
+                    }
+
+                </div>
+
+                <div class="actions">
+
+                    <button class="btn secondary"
+                        onclick="editProduct(${p.id})">
+                        Edit product
+                    </button>
+
+                    <button class="btn danger"
+                        onclick="deleteProduct(${p.id})">
+                        Remove
+                    </button>
+
+                </div>
+
+            </div>
+        `).join('')
+
+        : '<p class="muted">No products listed yet.</p>';
+}
+
+// LOAD ORDERS
+async function loadOrders() {
+
+    const orders = await api('api/seller/orders');
+
+    document.getElementById('sellerOrders').innerHTML =
+        orders.length ? orders.map(o => `
+            <div class="item">
+
+                <strong>${esc(o.order_number)}</strong>
+
+                <div>${esc(o.name)} × ${o.quantity}</div>
+
+                <div class="small">
+                    ${esc(o.delivery_city)}, ${esc(o.delivery_state)}
+                    · ₹${o.total_amount} · ${esc(o.status)}
+                </div>
+
+                <select id="status-${o.seller_order_id}">
+                    ${['CONFIRMED', 'PROCESSING', 'SHIPPED',
+                       'DELIVERED', 'CANCELLED']
+                        .map(v => `
+                            <option value="${v}"
+                                ${o.status === v ? 'selected' : ''}>
+                                ${v}
+                            </option>
+                        `).join('')}
+                </select>
+
+                <button class="btn secondary"
+                    onclick="updateOrder(${o.seller_order_id})">
+                    Update status
+                </button>
+
+            </div>
+        `).join('')
+
+        : '<p class="muted">No seller orders yet.</p>';
+}
+
+// SINGLE PRODUCT UPLOAD
+document.getElementById('productForm')
+.addEventListener('submit', async function(event) {
+
+    event.preventDefault();
+
+    const message = document.getElementById('productMsg');
+    message.classList.remove('hidden');
+
+    try {
+
+        const result = await api('api/seller/products', {
+            method: 'POST',
+            body: new FormData(event.target)
+        });
+
+        message.textContent =
+            result.message || 'Product uploaded successfully.';
+
+        event.target.reset();
+
+        await load();
+
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
+
+// BULK PRODUCT UPLOAD
+document.getElementById('bulkUploadForm')
+.addEventListener('submit', async function(event) {
+
+    event.preventDefault();
+
+    const message = document.getElementById('bulkUploadMsg');
+    const button = document.getElementById('bulkUploadButton');
+
+    message.classList.remove('hidden');
+    message.textContent =
+        'Uploading and validating your catalogue. Please keep this page open.';
+
+    button.disabled = true;
+    button.textContent = 'Uploading...';
+
+    try {
+
+        const result = await api('api/seller/bulk-products', {
+            method: 'POST',
+            body: new FormData(event.target)
+        });
+
+        message.textContent =
+            result.message ||
+            'Products and photographs uploaded successfully.';
+
+        event.target.reset();
+
+        await load();
+
+    } catch (error) {
+
+        message.textContent = error.message;
+        console.error('Bulk upload error:', error);
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = 'Upload products and photographs';
+
+    }
+});
+
+// EDIT PRODUCT
+async function editProduct(id) {
+
+    try {
+
+        const products = await api('api/seller/products');
+        const product = products.find(p => p.id === id);
+
+        if (!product) return;
+
+        const name = prompt('Product name:', product.name);
+        if (name === null) return;
+
+        const category = prompt('Category:', product.category);
+        if (category === null) return;
+
+        const material = prompt('Material:', product.material || '');
+        if (material === null) return;
+
+        const priceINR = prompt('Price in INR:', product.price_inr);
+        if (priceINR === null) return;
+
+        const stockQuantity = prompt(
+            'Available stock:',
+            product.stock_quantity
+        );
+        if (stockQuantity === null) return;
+
+        const origin = prompt('Product origin:', product.origin || '');
+        if (origin === null) return;
+
+        const description = prompt(
+            'Description:',
+            product.description || ''
+        );
+        if (description === null) return;
+
+        await api('api/seller/products', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId: id,
+                name,
+                category,
+                material,
+                origin,
+                description,
+                priceINR,
+                stockQuantity: Number(stockQuantity)
+            })
+        });
+
+        await loadProducts();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// DELETE PRODUCT
+async function deleteProduct(id) {
+
+    if (!confirm('Remove this product from the marketplace?')) {
+        return;
+    }
+
+    try {
+
+        await api('api/seller/products?id=' + id, {
+            method: 'DELETE'
+        });
+
+        await load();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// UPDATE ORDER
+async function updateOrder(id) {
+
+    try {
+
+        await api('api/seller/orders', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sellerOrderId: id,
+                status: document.getElementById(
+                    'status-' + id
+                ).value
+            })
+        });
+
+        await loadOrders();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// LOGOUT
+async function logout() {
+
+    try {
+        await fetch('api/auth/logout', {
+            method: 'POST'
+        });
+    } finally {
+        location.href = 'index.html';
+    }
+}
+
+// START SELLER STUDIO
+load().catch(error => {
+
+    console.error('Seller dashboard error:', error);
+
+    alert(error.message);
+
+});
+
+</script>
+
+<script src="chat-widget.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,526 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checkout | Handcraft Shop</title>
+    <link rel="stylesheet" href="portal.css">
+
+    <style>
+        .success-panel {
+            text-align: center;
+            padding: 30px 20px;
+            border: 1px solid #26845b;
+            border-radius: 14px;
+            background: #eaf8f0;
+            color: #155b3b;
+            margin-top: 20px;
+        }
+
+        .success-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #218653;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 15px;
+        }
+
+        .success-panel h2 {
+            margin: 10px 0;
+            color: #155b3b;
+        }
+
+        .success-panel p {
+            margin: 8px 0;
+        }
+
+        .success-details {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 18px 0;
+            text-align: left;
+        }
+
+        .success-details p {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .success-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .success-actions a {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            background: #218653;
+            color: white;
+            font-weight: bold;
+        }
+
+        .success-actions a.secondary {
+            background: #333;
+        }
+
+        .error-message {
+            background: #fff0f0;
+            color: #b42318;
+            border: 1px solid #e5a5a5;
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+    <header class="top">
+        <a class="brand" href="index.html">HANDCRAFT SHOP</a>
+
+        <nav class="links">
+            <a href="index.html">Continue shopping</a>
+            <a href="login.html">Sign in</a>
+            <a href="customer.html">My account</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <span class="eyebrow">Secure checkout</span>
+        <h1>Complete your acquisition.</h1>
+        <p class="muted">
+            One checkout can contain products from multiple artisan sellers.
+            Each seller receives a separate fulfilment order.
+        </p>
+    </section>
+
+    <div class="grid">
+
+        <section class="card" id="checkoutCard">
+
+            <h2>Delivery details</h2>
+
+            <form id="checkoutForm">
+
+                <div class="fieldrow">
+                    <div>
+                        <label>Recipient name</label>
+                        <input name="recipientName" required>
+                    </div>
+
+                    <div>
+                        <label>Phone</label>
+                        <input name="phone" required>
+                    </div>
+                </div>
+
+                <label>Email for order confirmation</label>
+                <input name="email" type="email" required>
+
+                <label>Address line</label>
+                <textarea name="addressLine" required></textarea>
+
+                <div class="fieldrow">
+                    <div>
+                        <label>City</label>
+                        <input name="city" required>
+                    </div>
+
+                    <div>
+                        <label>State</label>
+                        <input name="state" required>
+                    </div>
+
+                    <div>
+                        <label>PIN code</label>
+                        <input
+                            name="pincode"
+                            required
+                            pattern="[0-9]{5,6}"
+                        >
+                    </div>
+                </div>
+
+                <label>Payment method</label>
+
+                <select name="paymentMethod">
+                    <option value="TEST_PAYMENT">
+                        Simulated test payment (no real charge)
+                    </option>
+
+                    <option value="COD">
+                        Cash on delivery
+                    </option>
+
+                    <option value="TEST_CARD">
+                        Test card simulation
+                    </option>
+
+                    <option value="TEST_UPI">
+                        Test UPI simulation
+                    </option>
+                </select>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="saveAddress"
+                        value="true"
+                        style="width:auto"
+                    >
+                    Save this address to my customer account
+                </label>
+
+                <button class="btn" id="placeOrderBtn" type="submit">
+                    Place order
+                </button>
+
+            </form>
+
+            <div id="checkoutMsg" class="status hidden"></div>
+
+            <!-- Successful order confirmation -->
+            <div id="successPanel" class="success-panel hidden">
+
+                <div class="success-icon">✓</div>
+
+                <h2>Order Placed Successfully!</h2>
+
+                <p>
+                    Thank you for shopping with HandCraft Shop.
+                </p>
+
+                <p>
+                    Your order has been successfully confirmed.
+                </p>
+
+                <div class="success-details">
+
+                    <p>
+                        <strong>Order Number:</strong>
+                        <span id="successOrderNumber"></span>
+                    </p>
+
+                    <p>
+                        <strong>Total Amount:</strong>
+                        <span id="successTotal"></span>
+                    </p>
+
+                    <p>
+                        <strong>Payment Status:</strong>
+                        <span id="successPaymentStatus"></span>
+                    </p>
+
+                </div>
+
+                <p>
+                    You can check your order details and delivery status
+                    from your customer account.
+                </p>
+
+                <div class="success-actions">
+
+                    <a href="customer.html">
+                        View My Orders
+                    </a>
+
+                    <a href="index.html" class="secondary">
+                        Continue Shopping
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <aside class="card">
+
+            <h2>Your bag</h2>
+
+            <div id="summary" class="muted">
+                Loading bag…
+            </div>
+
+            <div class="status">
+                <strong>Payment note:</strong>
+                Test payment is simulated locally. It does not connect
+                to a bank, card network or UPI provider and does not
+                charge real money.
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+<script>
+
+let cartItems = [];
+
+const money = n =>
+    '₹' + Number(n || 0).toLocaleString('en-IN', {
+        maximumFractionDigits: 2
+    });
+
+
+// Load cart, products and customer information
+async function init() {
+
+    const [cartResponse, productResponse, userResponse] =
+        await Promise.all([
+            fetch('api/cart'),
+            fetch('api/products'),
+            fetch('api/auth/me')
+        ]);
+
+    if (!cartResponse.ok || !productResponse.ok || !userResponse.ok) {
+        throw new Error('Unable to load checkout information. Please sign in again.');
+    }
+
+    const c = await cartResponse.json();
+    const p = await productResponse.json();
+    const u = await userResponse.json();
+
+    if (!u.authenticated || u.role !== 'customer') {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    cartItems = c.items || [];
+
+    const products = p || [];
+
+    const rows = cartItems.map(x => {
+        const a = products.find(y => y.id === x.id);
+
+        return a ? { ...a, qty: x.qty } : null;
+
+    }).filter(Boolean);
+
+
+    // Display order summary
+    document.getElementById('summary').innerHTML = rows.length
+        ? rows.map(x => `
+            <div class="item">
+                <strong>${x.name}</strong>
+
+                <div class="small">
+                    ${x.category} · ${x.origin} · Qty ${x.qty}
+                </div>
+
+                <strong>
+                    ${money(x.priceINR * x.qty)}
+                </strong>
+            </div>
+        `).join('') +
+
+        `<h2>Total: ${money(
+            rows.reduce((s, x) => s + x.priceINR * x.qty, 0)
+        )}</h2>`
+
+        : 'Your bag is empty. <a href="index.html">Return to the collection</a>.';
+
+
+    // Load saved customer details
+    if (u.authenticated && u.role === 'customer') {
+
+        try {
+
+            const r = await fetch('api/profile');
+
+            if (r.ok) {
+
+                const profile = await r.json();
+
+                const f = document.getElementById('checkoutForm');
+
+                f.recipientName.value =
+                    profile.full_name || u.name || '';
+
+                f.phone.value =
+                    profile.phone || '';
+
+                f.email.value =
+                    profile.email || u.email || '';
+
+                f.addressLine.value =
+                    profile.address_line || '';
+
+                f.city.value =
+                    profile.city || '';
+
+                f.state.value =
+                    profile.state || '';
+
+                f.pincode.value =
+                    profile.pincode || '';
+
+            }
+
+        } catch (error) {
+            console.warn('Could not load saved address.', error);
+        }
+    }
+
+}
+
+
+// Place order
+document.getElementById('checkoutForm').addEventListener(
+    'submit',
+    async function(e) {
+
+        e.preventDefault();
+
+        const button = document.getElementById('placeOrderBtn');
+        const box = document.getElementById('checkoutMsg');
+        const successPanel = document.getElementById('successPanel');
+
+        if (!cartItems.length) {
+            box.classList.remove('hidden');
+            box.textContent = 'Your bag is empty. Please add products before placing an order.';
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Placing your order...';
+
+        box.classList.add('hidden');
+        successPanel.classList.add('hidden');
+
+        try {
+
+            const f = new FormData(e.target);
+
+            const d = Object.fromEntries(f);
+
+            d.saveAddress = f.get('saveAddress') === 'true';
+
+            d.items = cartItems.map(x => ({
+                productId: x.id,
+                quantity: x.qty
+            }));
+
+            d.address = {
+                recipientName: d.recipientName,
+                phone: d.phone,
+                addressLine: d.addressLine,
+                city: d.city,
+                state: d.state,
+                pincode: d.pincode
+            };
+
+            delete d.recipientName;
+            delete d.phone;
+            delete d.addressLine;
+            delete d.city;
+            delete d.state;
+            delete d.pincode;
+
+
+            const response = await fetch('api/orders', {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify(d)
+
+            });
+
+
+            const result = await response.json();
+
+
+            if (!response.ok) {
+                throw new Error(
+                    result.error || 'Order could not be placed.'
+                );
+            }
+
+
+            // Show success message only after backend confirms success
+            document.getElementById('successOrderNumber').textContent =
+                result.orderNumber || 'Confirmed';
+
+            document.getElementById('successTotal').textContent =
+                money(result.total);
+
+            document.getElementById('successPaymentStatus').textContent =
+                result.paymentStatus || 'Pending';
+
+
+            // Hide checkout form after successful order
+            document.getElementById('checkoutForm').classList.add('hidden');
+
+            document.getElementById('checkoutCard')
+                .querySelector('h2').classList.add('hidden');
+
+            successPanel.classList.remove('hidden');
+
+
+            // Clear local cart after successful order
+            cartItems = [];
+
+            document.getElementById('summary').innerHTML = `
+                <h2>Thank you!</h2>
+                <p>Your order has been placed successfully.</p>
+                <p>Order Number: ${result.orderNumber || 'Confirmed'}</p>
+            `;
+
+
+        } catch (error) {
+
+            box.classList.remove('hidden');
+            box.textContent = error.message;
+
+            button.disabled = false;
+            button.textContent = 'Place order';
+
+        }
+
+    }
+);
+
+
+// Start checkout page
+init().catch(error => {
+
+    document.getElementById('summary').textContent =
+        error.message;
+
+});
+
+</script>
+
+<script src="chat-widget.js"></script>
+
+</body>
+</html>
+```

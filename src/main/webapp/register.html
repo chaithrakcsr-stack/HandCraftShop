@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register | Handcraft Shop</title>
+    <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+
+<div class="wrap">
+
+    <header class="top">
+        <a class="brand" href="index.html">HANDCRAFT SHOP</a>
+
+        <nav class="links">
+            <a href="index.html">Storefront</a>
+            <a href="login.html">Sign in</a>
+            <a href="seller.html">Seller studio</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <span class="eyebrow">Join the maker community</span>
+        <h1>Create your marketplace account.</h1>
+        <p class="muted">
+            Shop as a customer or apply to sell handmade products.
+        </p>
+    </section>
+
+    <div class="grid">
+
+        <section class="card">
+
+            <h2>Registration</h2>
+
+            <form id="registerForm">
+
+                <label>Register as</label>
+
+                <select name="accountType" id="accountType">
+                    <option value="customer">Customer</option>
+                    <option value="seller">Artisan seller</option>
+                </select>
+
+                <!-- Customer fields -->
+                <div id="customerFields">
+
+                    <label>Full name</label>
+                    <input name="fullName" required>
+
+                    <label>Phone</label>
+                    <input name="phone" type="tel">
+
+                </div>
+
+                <!-- Seller fields -->
+                <div id="sellerFields" class="hidden">
+
+                    <label>Shop name</label>
+                    <input name="shopName">
+
+                    <label>Owner name</label>
+                    <input name="ownerName">
+
+                    <label>Shop location (city, state)</label>
+                    <input
+                        name="sellerLocation"
+                        placeholder="e.g. Jaipur, Rajasthan">
+
+                    <label>Craft speciality</label>
+                    <input
+                        name="craftSpeciality"
+                        placeholder="e.g. pottery, crochet, wood carving">
+
+                    <label>Shop description</label>
+                    <textarea name="shopDescription"></textarea>
+
+                </div>
+
+                <label>Email</label>
+                <input name="email" type="email" required>
+
+                <label>Password (minimum 8 characters)</label>
+                <input
+                    name="password"
+                    type="password"
+                    minlength="8"
+                    required>
+
+                <button class="btn" type="submit" id="registerButton">
+                    Create account
+                </button>
+
+            </form>
+
+            <div id="registerMsg" class="status hidden"></div>
+
+        </section>
+
+        <section class="card">
+
+            <h2>Seller approval</h2>
+
+            <p>
+                Seller applications start as pending.
+                The marketplace admin reviews shop information
+                before sellers can publish products.
+            </p>
+
+            <p class="small">
+                Passwords are stored as PBKDF2 password hashes,
+                not plain text.
+            </p>
+
+        </section>
+
+    </div>
+</div>
+
+<script>
+
+"use strict";
+
+// Get HTML elements
+
+const type = document.getElementById("accountType");
+const cf = document.getElementById("customerFields");
+const sf = document.getElementById("sellerFields");
+const form = document.getElementById("registerForm");
+const box = document.getElementById("registerMsg");
+const button = document.getElementById("registerButton");
+
+// Switch between customer and seller
+
+function toggle() {
+
+    const seller = type.value === "seller";
+
+    cf.classList.toggle("hidden", seller);
+    sf.classList.toggle("hidden", !seller);
+
+    // Customer fields
+
+    cf.querySelectorAll("input, textarea, select")
+        .forEach(input => {
+
+            input.disabled = seller;
+
+            input.required =
+                !seller && input.name === "fullName";
+
+        });
+
+    // Seller fields
+
+    sf.querySelectorAll("input, textarea, select")
+        .forEach(input => {
+
+            input.disabled = !seller;
+
+            input.required = seller &&
+                ["shopName", "ownerName", "sellerLocation"]
+                    .includes(input.name);
+
+        });
+}
+
+// Listen for account type changes
+
+type.addEventListener("change", toggle);
+
+// Set initial form
+
+toggle();
+
+// Registration submit event
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const data = Object.fromEntries(
+        new FormData(form).entries()
+    );
+
+    box.classList.remove("hidden");
+    box.textContent = "Creating your account...";
+
+    button.disabled = true;
+    button.textContent = "Please wait...";
+
+    try {
+
+        const response = await fetch("api/auth/register", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(data)
+
+        });
+
+        const responseText = await response.text();
+
+        let result;
+
+        try {
+            result = JSON.parse(responseText);
+        } catch {
+            throw new Error(
+                "Invalid server response. Check Eclipse Console."
+            );
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                result.error || "Registration failed."
+            );
+        }
+
+        box.textContent = result.message ||
+            "Account created successfully. Please sign in.";
+
+        box.style.color = "green";
+
+        button.textContent = "Registration successful";
+
+        // IMPORTANT: Correct JavaScript navigation syntax
+
+        setTimeout(function() {
+            window.location.href = "login.html";
+        }, 1200);
+
+    } catch (error) {
+
+        box.textContent = error.message;
+        box.style.color = "#e06d53";
+
+        console.error("Registration error:", error);
+
+        button.disabled = false;
+        button.textContent = "Create account";
+
+    }
+
+});
+
+</script>
+
+<script src="chat-widget.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+/target/
+.settings/
+.classpath
+.project
+*.log
+/src/main/webapp/uploads/*
+!/src/main/webapp/uploads/.gitkeep
