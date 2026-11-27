@@ -1,10 +1,14 @@
-
 FROM maven:3.9-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
 COPY pom.xml .
+
 COPY src ./src
+
+RUN mkdir -p /root/.m2 && printf '%s\n' \
+    '<settings><mirrors><mirror><id>google-maven-central</id><name>Google Maven Central Mirror</name><url>https://maven-central.storage-download.googleapis.com/maven2/</url><mirrorOf>central</mirrorOf></mirror></mirrors></settings>' \
+    > /root/.m2/settings.xml
 
 RUN mvn clean package -DskipTests
 
